@@ -14,13 +14,15 @@ This plugin will monitor and control your [ecobee][] thermostat(s) through your 
 
 * Control temperature set points, thermostat mode and fan mode.
 
+* More TBD
+
 ## How to Use the Plugin ##
 
-Upon installing the ecobee plugin, it will attempt to connect with the ecobee.com servers and obtain a four-character PIN, in order to authorize the plugin to access your `ecobee.com` account.  This PIN will be displayed on the ecobee device that was created on installation.  You then have about ten minutes to enter this PIN in the My Apps widget in your `ecobee.com` web portal.  Also choose a polling frequency (in seconds) if you want to poll more or less often than the default 120 seconds.  You may not poll more often than every 60 seconds, as this might be considered abusive by the `ecobee.com` servers.
+Upon installing the ecobee plugin, it will attempt to connect with the ecobee.com servers and obtain a four-character PIN in order to authorize the plugin to access your ecobee.com account.  This PIN will be displayed on the ecobee device that was created on installation.  You then have about ten minutes to enter this PIN in the My Apps widget in your ecobee.com web portal.  (Mark your calendar for next year because this PIN authorization expires after one year.)
 
 ### Choosing which thermostats to monitor and control ###
 
-If you are a non-commercial customer with one or more ecobee SI thermostats, you can skip this section.
+_If you are a non-commercial customer with one or more ecobee Si thermostats (and not EMS model thermostats), you can skip this section.  Otherwise, perform this step now._
 
 If you are an EMS (energy management system) commercial customer, you must also set values for two variables on the Advanced tab of the ecobee device.  The variables are `selectionType` and `selectionMatch` and must be set according to the following rules:
 
@@ -30,9 +32,22 @@ If you are an EMS (energy management system) commercial customer, you must also 
 <tr><td>managementSet</td><td>path to the management set of thermostats (these sets are managed through the ecobee.com EMS Management Portal.)</td><td>/Washington/Warren/Floor2<br />/</td></tr>
 </table>
 
-*Note:* Please make sure that you specify the proper upper- and lowercase letters for `thermostats` and `managementSet`.
+_Note:_ Please make sure that you specify the proper upper- and lowercase letters when entering the above variable values.
 
-After the initial polling interval, the plugin will attempt to retrieve information about the thermostats that you specified in the selection criteria above.  The plugin will create a thermostat and humidistat device for each thermostat it discovers.  It will name each device as it is named in the thermostat itself, or if there is no name, it will name the device using the thermostat's serial number.  You can change this name in the Advanced tab of the thermostat and/or humidistat devices with no ill effects.
+After you have entered the PIN in your My Apps widget at ecobee.com, on the next polling cycle the plugin will attempt to retrieve information about the thermostats that you specified in the selection criteria above.  The plugin will create a thermostat and humidistat device for each thermostat it discovers.  It will name each device as it is named in the thermostat itself, or if there is no name, it will name the device using the thermostat's serial number.  You can change this name in the Advanced tab of the thermostat and/or humidistat devices.
+
+## UPnP actions for ecobee Thermostats ##
+
+Your Vera automation triggers can perform the following actions on a specific thermostat.  The main ecobee device also implements these actions, in which case the action is applied to all thermostats that match the `selectionType` and `selectionMatch` you specified above.
+
+### SendMessage ###
+
+Send a text message to a thermostat's display screen.  The text message can be up to 500 characters long.
+
+<table>
+<thead><tr><th>Parameter</th><th>Direction</th><th>Value</th></tr>
+<tr><td>MessageText</td><td>In</td><td>Up to 500 characters of text.</td></tr>
+</table>
 
 ## Notes and Limitations ##
 
@@ -73,8 +88,7 @@ Please contact me through the [micasaverde.com forum][me].  All tips are gratefu
 
 ## Thanks ##
 
-`futzle`, `garretwp`, `guessed`, `RichardTSchaefer` and others on the forum for their kind assistance.
-`hugheaves` for his `decompressScript` shell script workaround for the problem with deploying compressed modules and for providing his open-source plugin for a different make/model thermostat.
+Thanks to ecobee and their enthusiastic customers, `futzle`, `garretwp`, `guessed`, `RichardTSchaefer`, `hugheaves` and others on the Mi Casa Verde forum.
 
 ## Future Plans ##
 
