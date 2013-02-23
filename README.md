@@ -24,13 +24,20 @@ Upon installing the ecobee plugin, it will attempt to connect with the ecobee.co
 
 _If you are a non-commercial customer with one or more ecobee Si thermostats (and not EMS model thermostats), you can skip this section.  Otherwise, perform this step now._
 
-If you are an EMS (energy management system) commercial customer, you must also set values for two variables on the Advanced tab of the ecobee device.  The variables are `selectionType` and `selectionMatch` and must be set according to the following rules:
+If you are an Energy Management System (EMS) commercial customer, you must also set values for _three_ variables on the Advanced tab of the ecobee device.  The variables are `scope`, `selectionType` and `selectionMatch` and must be set according to the following rules:
 
-<table>
-<tr><th>selectionType</th><th>selectionMatch</th><th>examples</th></tr>
-<tr><td>thermostats</td><td>comma-separated list of thermostat identifiers (no spaces and 25 identifiers maximum)</td><td>276075669054,276181238912</td></tr>
-<tr><td>managementSet</td><td>path to the management set of thermostats (these sets are managed through the ecobee.com EMS Management Portal.)</td><td>/Washington/Warren/Floor2<br />/</td></tr>
-</table>
+| `scope` | `selectionType` | `selectionMatch` | examples              |
+|---------|-----------------|:-----------------|:----------------------|
+| **ems** | **thermostats**   | comma-separated list of thermostat identifiers (no spaces and 25 identifiers maximum) | 276075669054,276181238912 |
+| **ems** | **managementSet** | path to the management set of thermostats (these sets are managed through the ecobee.com EMS Management Portal.) | /Washington/Warren/Floor2<br />/ |
+
+If you are _not_ an EMS customer, these variables must be set like this (which are the plugin's default values):
+
+| `scope` | `selectionType` | `selectionMatch` | examples              |
+|---------|-----------------|:-----------------|:----------------------|
+| **smartWrite** | **thermostats**   | comma-separated list of thermostat identifiers (no spaces and 25 identifiers maximum) | 276075669054,276181238912 |
+| **smartWrite** | **registered** | | (`selectionMatch` is empty)|
+
 
 _Note:_ Please make sure that you specify the proper upper- and lowercase letters when entering the above variable values.
 
@@ -44,10 +51,10 @@ Your Vera automation triggers can perform the following actions on a specific th
 
 Send a text message to a thermostat's display screen.  The text message can be up to 500 characters long.
 
-<table>
-<thead><tr><th>Parameter</th><th>Direction</th><th>Value</th></tr>
-<tr><td>MessageText</td><td>In</td><td>Up to 500 characters of text.</td></tr>
-</table>
+| Parameter   | Direction | Value                         |
+|:------------|:----------|:------------------------------|
+| MessageText | In        | Up to 500 characters of text. |
+
 
 ## Notes and Limitations ##
 
@@ -73,6 +80,8 @@ You should have received a copy of the GNU General Public License along with thi
 
 The source code repository and issue list can be located at <https://github.com/watou/vera-ecobee-thermostat>.
 
+House icon copyright [Alexander Moore](http://www.mricons.com/show/iconset:vista-inspirate-icons).
+
 ## Feedback  ##
 
 Please contact me through the [micasaverde.com forum][me].  All tips are gratefully accepted!
@@ -88,7 +97,7 @@ Please contact me through the [micasaverde.com forum][me].  All tips are gratefu
 
 ## Thanks ##
 
-Thanks to ecobee and their enthusiastic customers, `futzle`, `garretwp`, `guessed`, `RichardTSchaefer`, `hugheaves` and others on the Mi Casa Verde forum.
+Thanks to [ecobee][] and their enthusiastic customers, and the helpful contributors on the [Mi Casa Verde forum](http://forum.micasaverde.com).
 
 ## Future Plans ##
 
