@@ -22,16 +22,16 @@ Upon installing the ecobee plugin, it will attempt to connect with the ecobee.co
 
 ### Choosing which thermostats to monitor and control ###
 
-_If you are a non-commercial customer with one or more ecobee Si thermostats (and not EMS model thermostats), you can skip this section.  Otherwise, perform this step now._
+_If you are a **non-commercial customer** with one or more ecobee Si thermostats (not EMS model thermostats), the default values should work for you and you can skip this section.  Otherwise, perform this step now._
 
-If you are an Energy Management System (EMS) commercial customer, you must also set values for _three_ variables on the Advanced tab of the ecobee device.  The variables are `scope`, `selectionType` and `selectionMatch` and must be set according to the following rules:
+If you are an Energy Management System (EMS) commercial customer, you must also set values for three variables on the Advanced tab of the ecobee device.  The variables are `scope`, `selectionType` and `selectionMatch` and must be set according to the following rules:
 
 | `scope` | `selectionType` | `selectionMatch` | examples              |
 |---------|-----------------|:-----------------|:----------------------|
 | **ems** | **thermostats**   | comma-separated list of thermostat identifiers (no spaces and 25 identifiers maximum) | 276075669054,276181238912 |
 | **ems** | **managementSet** | path to the management set of thermostats (these sets are managed through the ecobee.com EMS Management Portal.) | /Washington/Warren/Floor2<br />/ |
 
-If you are _not_ an EMS customer, these variables must be set like this (which are the plugin's default values):
+If you are non-commercial customer, these variables must be set like this (which are the plugin's default values):
 
 | `scope` | `selectionType` | `selectionMatch` | examples              |
 |---------|-----------------|:-----------------|:----------------------|
@@ -39,7 +39,7 @@ If you are _not_ an EMS customer, these variables must be set like this (which a
 | **smartWrite** | **registered** | | (`selectionMatch` is empty)|
 
 
-_Note:_ Please make sure that you specify the proper upper- and lowercase letters when entering the above variable values.
+_Please make sure that you specify the proper upper- and lowercase letters when entering the above variable values._
 
 After you have entered the PIN in your My Apps widget at ecobee.com, on the next polling cycle the plugin will attempt to retrieve information about the thermostats that you specified in the selection criteria above.  The plugin will create a thermostat and humidistat device for each thermostat it discovers.  It will name each device as it is named in the thermostat itself, or if there is no name, it will name the device using the thermostat's serial number.  You can change this name in the Advanced tab of the thermostat and/or humidistat devices.
 
