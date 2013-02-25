@@ -47,6 +47,12 @@ After you have entered the PIN in your My Apps widget at ecobee.com, on the next
 
 Your Vera automation triggers can perform the following actions on a specific thermostat.  The main ecobee device also implements these actions, in which case the action is applied to all thermostats that match the `selectionType` and `selectionMatch` you specified above.
 
+### ResumeProgram ###
+
+Remove the active event and resume the thermostat's program, or enter the next event in the stack if one exists.
+
+This action has no parameters.
+
 ### SendMessage ###
 
 Send a text message to a thermostat's display screen.  The text message can be up to 500 characters long.
