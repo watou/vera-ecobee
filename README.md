@@ -1,6 +1,9 @@
 <!--	Vera Plugin for ecobee Thermostats	-->
 
+
 ![Devices in Vera](http://cocu.la/vera/ecobee/images/shot1.jpg)
+
+**Under Current Development**
 
 ## Purpose ##
 This plugin will monitor and control your [ecobee][] thermostat(s) through your [Vera][] home automation gateway.
