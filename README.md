@@ -6,7 +6,7 @@
 **Under Current Development**
 
 ## Purpose ##
-This plugin will monitor and control your [ecobee][] thermostat(s) through your [Vera][] home automation gateway.
+This plugin will monitor and control your [ecobee][] thermostat(s) through your [Vera][] home controller.
 
 [ecobee]: http://www.ecobee.com
 [vera]: http://www.micasaverde.com
