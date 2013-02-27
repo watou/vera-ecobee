@@ -3,7 +3,7 @@
 
 ![Devices in Vera](http://cocu.la/vera/ecobee/images/shot1.jpg)
 
-**Under Current Development**
+**Currently in development**
 
 ## Purpose ##
 This plugin will monitor and control your [ecobee][] thermostat(s) through your [Vera][] home controller.
@@ -20,6 +20,11 @@ This plugin will monitor and control your [ecobee][] thermostat(s) through your 
 * More TBD
 
 ## How to Use the Plugin ##
+
+First, login to your web portal at [ecobee][] and switch to the [settings tab][].  Familiarize yourself with
+the portal, and Choose `My Apps` on the left edge of the screen to enable that view.
+
+[settings tab]: https://www.ecobee.com/home/secure/settings.jsf
 
 Upon installing the ecobee plugin, it will attempt to connect with the ecobee.com servers and obtain a four-character PIN in order to authorize the plugin to access your ecobee.com account.  This PIN will be displayed on the ecobee device that was created on installation.  You then have about ten minutes to enter this PIN in the My Apps widget in your ecobee.com web portal.  (Mark your calendar for next year because this PIN authorization expires after one year.)
 
