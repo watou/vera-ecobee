@@ -19,6 +19,8 @@ This plugin will monitor and control your [ecobee][] thermostat(s) through your 
 
 * Use a QuickSave-like hold event (for Si thermostats) or SwitchOccupancy event (for EMS thermostats) to set and monitor an "away" state.
 
+* Perform common functions, such as sending a text message or resuming the program, to an individual thermostat or a group of thermostats.
+
 ## How to Use the Plugin ##
 
 First, login to your web portal at [ecobee][] and switch to the [settings tab][].  Familiarize yourself with
@@ -26,13 +28,17 @@ the portal, and Choose `My Apps` on the left edge of the screen to enable that v
 
 [settings tab]: https://www.ecobee.com/home/secure/settings.jsf
 
-Upon installing the ecobee plugin, it will attempt to connect with the ecobee.com servers and obtain a four-character PIN in order to authorize the plugin to access your ecobee.com account.  This PIN will be displayed on the Vera dashboard on the ecobee device that was created on installation.  You then have about ten minutes to enter this PIN in the My Apps widget in your ecobee.com web portal.  (Mark your calendar for next year because this PIN authorization expires after one year.  External events may also invalidate the authorization sooner, which will trigger the PIN request process again.)
+Upon installing the ecobee plugin, it will attempt to connect with the ecobee.com servers and obtain a four-character PIN in order to authorize the plugin to access your ecobee.com account.  This PIN will be displayed on the Vera dashboard on the ecobee device that was created at installation.  You then have about ten minutes to enter this PIN in the My Apps widget in your ecobee.com web portal.  (Mark your calendar for next year because this PIN authorization expires after one year.  External events may also invalidate the authorization sooner, which will trigger the PIN request process again.)
 
 ### Choosing which thermostats to monitor and control ###
 
 _If you are a **non-commercial customer** with one or more ecobee Si thermostats (not EMS model thermostats), the default values should work for you and you can skip this section.  Otherwise, perform this step now._
 
-If you are an Energy Management System (EMS) commercial customer, you must also set values for three variables on the Advanced tab of the ecobee device.  The variables are `scope`, `selectionType` and `selectionMatch` and must be set according to the following rules:
+If you are an Energy Management System (EMS) commercial customer, you must also set values for three variables on the Advanced tab of the ecobee device.
+
+![Advanced tab of the ecobee device](http://cocu.la/vera/ecobee/images/shot2a.jpg)
+
+The variables are `scope`, `selectionType` and `selectionMatch` and must be set according to the following rules:
 
 | `scope` | `selectionType` | `selectionMatch` | examples              |
 |---------|-----------------|:-----------------|:----------------------|
