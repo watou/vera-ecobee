@@ -15,7 +15,7 @@ This plugin will monitor and control your [ecobee][] thermostat(s) through your 
 
 * Monitor thermostat mode, fan mode, current and set point temperatures, humidity level, current event and current climate.
 
-* Change HVAC mode and set holds for temperature set points and fan mode.
+* Change HVAC mode and set indefinite holds for temperature set points and fan mode, and allow the program to resume from these holds.
 
 * Use a QuickSave-like hold event (for Si thermostats) or SwitchOccupancy event (for EMS thermostats) to set and monitor an "away" state.
 
@@ -26,7 +26,7 @@ the portal, and Choose `My Apps` on the left edge of the screen to enable that v
 
 [settings tab]: https://www.ecobee.com/home/secure/settings.jsf
 
-Upon installing the ecobee plugin, it will attempt to connect with the ecobee.com servers and obtain a four-character PIN in order to authorize the plugin to access your ecobee.com account.  This PIN will be displayed on the Vera dashboard on the ecobee device that was created on installation.  You then have about ten minutes to enter this PIN in the My Apps widget in your ecobee.com web portal.  (Mark your calendar for next year because this PIN authorization expires after one year.  External events may also invalidate the authorization which will trigger the PIN request process again.)
+Upon installing the ecobee plugin, it will attempt to connect with the ecobee.com servers and obtain a four-character PIN in order to authorize the plugin to access your ecobee.com account.  This PIN will be displayed on the Vera dashboard on the ecobee device that was created on installation.  You then have about ten minutes to enter this PIN in the My Apps widget in your ecobee.com web portal.  (Mark your calendar for next year because this PIN authorization expires after one year.  External events may also invalidate the authorization sooner, which will trigger the PIN request process again.)
 
 ### Choosing which thermostats to monitor and control ###
 
