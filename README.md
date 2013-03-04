@@ -39,7 +39,7 @@ If you are an Energy Management System (EMS) commercial customer, you must also 
 | **ems** | **thermostats**   | comma-separated list of thermostat identifiers (no spaces and 25 identifiers maximum) | 276075669054,276181238912 |
 | **ems** | **managementSet** | path to the management set of thermostats (these sets are managed through the ecobee.com EMS Management Portal.) | /Washington/Warren/Floor2<br />/ |
 
-If you are non-commercial customer, these variables must be set like this (which are the plugin's default values):
+If you are non-commercial customer, these variables must be set like this (a `selectionType` of `registered` is the plugin's default setting):
 
 | `scope` | `selectionType` | `selectionMatch` | examples              |
 |---------|-----------------|:-----------------|:----------------------|
