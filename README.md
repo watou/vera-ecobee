@@ -23,12 +23,15 @@ This plugin will monitor and control your [ecobee][] thermostat(s) through your 
 
 ## How to Use the Plugin ##
 
-First, login to your web portal at [ecobee][] and switch to the [settings tab][].  Familiarize yourself with
-the portal, and Choose `My Apps` on the left edge of the screen to enable that view.
+First, login to your web portal at [ecobee][] and switch to the [settings tab][].  Familiarize yourself with the portal, and Choose `My Apps` on the left edge of the screen to enable that view.  Leave this browser window open before proceeding to the next step.
 
 [settings tab]: https://www.ecobee.com/home/secure/settings.jsf
 
-Upon installing the ecobee plugin, it will attempt to connect with the ecobee.com servers and obtain a four-character PIN in order to authorize the plugin to access your ecobee.com account.  This PIN will be displayed on the Vera dashboard on the ecobee device that was created at installation.  You then have about ten minutes to enter this PIN in the My Apps widget in your ecobee.com web portal.  (Mark your calendar for next year because this PIN authorization expires after one year.  External events may also invalidate the authorization sooner, which will trigger the PIN request process again.)
+### Plugin Authorization with ecobee.com ###
+
+Ecobee uses the [OAuth 2.0](http://oauth.net/) framework for authorizng client applications, such as this plugin.  The practical implication of this is that you do not specify your user name and password in the plugin's settings; instead you grant access by entering a four-character PIN in the ecobee web portal when presented with one.  _Please note that one ecobee account can only authorize a single plugin at one time. If you authorize the plugin from a different Vera, it will invalidate all previous authorizations of the plugin for that ecobee account._
+
+Upon installing the ecobee plugin, it will attempt to connect with the ecobee.com servers and obtain a four-character PIN in order to authorize the plugin to access your ecobee.com account.  This PIN will be displayed on the Vera dashboard on the ecobee device that was created at installation.  Once you see it, you then have ten minutes or less to enter this PIN in the My Apps widget in your ecobee.com web portal.  (Also, you may want to mark your calendar for next year because this PIN authorization expires after one year.  External events may also invalidate the authorization sooner, which will trigger the PIN request process again.)
 
 ### Choosing which thermostats to monitor and control ###
 
@@ -59,7 +62,7 @@ After you have entered the PIN in your My Apps widget at ecobee.com, on the next
 
 ## UPnP actions for ecobee Thermostats ##
 
-Your Vera automation triggers can perform the following actions on a specific thermostat.  The main ecobee device also implements these actions, in which case the action is applied to all thermostats that match the `selectionType` and `selectionMatch` you specified above.
+In addition to the standard thermostat actions, your Vera automation triggers can also perform the following actions on a specific thermostat.  The main ecobee device also implements these actions, in which case the action is applied to all thermostats that match the `selectionType` and `selectionMatch` you specified above.
 
 ### ResumeProgram ###
 
@@ -82,16 +85,7 @@ Send a text message to a thermostat's display screen.  The text message can be u
 
 * Updates to the state of thermostat and humidistat devices can take up to the polling number of seconds (120 by default) to be reflected in the UPnP devices (or as quickly as 5 seconds).
 
-* One Vera will only maintain a single ecobee.com authentication, so creating multiple
-instances of the ecobee device will not request multiple PINs for authentication.  This
-means that a single Vera cannot be used to manage instances of the ecobee device
-authenticated against multiple ecobee.com accounts.  The other choice was to require
-that each instance of the ecobee device request a PIN against all different ecobee.com user
-accounts, which seemed less useful in practice.  So the only scenario that works currently
-is where a single ecobee.com user wants to authenticate a single Vera, and on that Vera,
-there can be multiple instances of the ecobee device connected to the same ecobee.com
-user account (but with different selectionMatches specified in the Advanced tab variables 
-to make doing so useful).  Please contact [me][] if your requirements differ.
+* One Vera will only maintain a single ecobee.com authentication, so creating multiple instances of the ecobee device will not request multiple PINs for authentication.  This means that a single Vera cannot be used to manage instances of the ecobee device authenticated against multiple ecobee.com accounts.  The other choice was to require that each instance of the ecobee device request a PIN against all different ecobee.com user accounts, which seemed less useful in practice.  So the only scenario that works currently is where a single ecobee.com user wants to authenticate a single Vera, and on that Vera, there can be multiple instances of the ecobee device connected to the same ecobee.com user account (but with different selectionMatches specified in the Advanced tab variables to make doing so useful).  Please contact [me][] if your requirements differ.
 
 [me]: http://forum.micasaverde.com/index.php?action=profile;u=19018
 
