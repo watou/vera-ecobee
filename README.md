@@ -62,7 +62,7 @@ If you are non-commercial customer, these variables must be set like this (a `se
 
 _Please make sure that you specify the proper upper- and lowercase letters when entering the above variable values._
 
-_If you changed the value of the `scope` variable, also completely empty the `auth_token` field so that the plugin can request a new PIN using the proper account type.
+_If you changed the value of the `scope` variable, also completely empty the `auth\_token` field so that the plugin can request a new PIN using the proper account type._
 
 After you have entered the PIN in your My Apps widget at ecobee.com, on the next polling cycle the plugin will attempt to retrieve information about the thermostats that you specified in the selection criteria above.  The plugin will create a thermostat, humidistat and home/away switch device for each thermostat it discovers.  It will name each device as it is named in the thermostat itself, or if there is no name, it will name the device using the thermostat's unique identifier.  You can change this name in the Advanced tab of the device.
 
