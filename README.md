@@ -13,7 +13,7 @@ This plugin will monitor and control your [ecobee][] thermostat(s) through your 
 
 ## Features ##
 
-* Monitor thermostat mode, fan mode, current and set point temperatures, humidity level, current event and current climate.
+* Monitor thermostat mode, fan mode, current and set point temperatures, humidity level, current event (if any) and current climate.
 
 * Change HVAC mode and set indefinite holds for temperature set points and fan mode, and allow the program to resume from these holds.
 
@@ -29,9 +29,13 @@ First, login to your web portal at [ecobee][] and switch to the [settings tab][]
 
 ### Plugin Authorization with ecobee.com ###
 
-Ecobee uses the [OAuth 2.0](http://oauth.net/) framework for authorizng client applications, such as this plugin.  The practical implication of this is that you do not specify your user name and password in the plugin's settings; instead you grant access by entering a four-character PIN in the ecobee web portal when presented with one.  _Please note that one ecobee account can only authorize a single plugin at one time. If you authorize the plugin from a different Vera, it will invalidate all previous authorizations of the plugin for that ecobee account._
+Ecobee uses the [OAuth 2.0](http://oauth.net/) framework for authorizing client applications, such as this plugin.  The practical implication of this is that you do not specify your user name and password in the plugin's settings; instead you grant access by entering a four-character PIN in the ecobee web portal when presented with one by the plugin.  _Please note that one ecobee account can only authorize a single plugin at one time. If you authorize the plugin from a different Vera, it will invalidate any previous authorization of the plugin for that ecobee account._
 
-Upon installing the ecobee plugin, it will attempt to connect with the ecobee.com servers and obtain a four-character PIN in order to authorize the plugin to access your ecobee.com account.  This PIN will be displayed on the Vera dashboard on the ecobee device that was created at installation.  Once you see it, you then have ten minutes or less to enter this PIN in the My Apps widget in your ecobee.com web portal.  (Also, you may want to mark your calendar for next year because this PIN authorization expires after one year.  External events may also invalidate the authorization sooner, which will trigger the PIN request process again.)
+Upon installing the ecobee plugin, it will attempt to connect with the ecobee.com servers and obtain a four-character PIN in order to authorize the plugin to access your ecobee.com account.  This PIN will be displayed on the Vera dashboard on the ecobee device that was created at installation.
+
+![ecobee device prompting to register PIN at ecobee.com](http://cocu.la/vera/ecobee/images/shot2b.jpg)
+
+Once you see it, you then have ten minutes or less to enter this PIN in the My Apps widget in your ecobee.com web portal.  (Also, you may want to mark your calendar for next year because this PIN authorization expires after one year.  External events may also invalidate the authorization sooner, which will trigger the PIN request process again.)
 
 ### Choosing which thermostats to monitor and control ###
 
@@ -57,6 +61,8 @@ If you are non-commercial customer, these variables must be set like this (a `se
 
 
 _Please make sure that you specify the proper upper- and lowercase letters when entering the above variable values._
+
+_If you changed the value of the `scope` variable, also completely empty the `auth_token` field so that the plugin can request a new PIN using the proper account type.
 
 After you have entered the PIN in your My Apps widget at ecobee.com, on the next polling cycle the plugin will attempt to retrieve information about the thermostats that you specified in the selection criteria above.  The plugin will create a thermostat, humidistat and home/away switch device for each thermostat it discovers.  It will name each device as it is named in the thermostat itself, or if there is no name, it will name the device using the thermostat's unique identifier.  You can change this name in the Advanced tab of the device.
 
@@ -129,6 +135,7 @@ Thanks to [ecobee][] and their enthusiastic customers, and the helpful contribut
 * See about integrating historical energy usage data into the plugin.
 * Report the heating or cooling stage, since ecobee supports multiple heating and cooling stages.
 * More automation.
+* Monitor and manage ecobee's Smart Plugs as individual `urn:schemas-upnp-org:device:BinaryLight:1` devices when used with Smart thermostats.
 * Implement Humidistat functionality to control humidity from Vera.
 
 ## History ##
