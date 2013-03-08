@@ -84,12 +84,12 @@ After you have entered the PIN in your My Apps widget at ecobee.com, on the next
 | urn:upnp-org:serviceId:TemperatureSensor1 | CurrentTemperature | current temperature in Vera's temperature scale |
 | urn:upnp-org:serviceId:TemperatureSetpoint1_Heat | CurrentSetpoint | current heat setpoint |
 | urn:upnp-org:serviceId:TemperatureSetpoint1_Cool | CurrentSetpoint | current cool setpoint |
-| urn:upnp-org:serviceId:HVAC_FanOperatingMode1 | Mode | fan operating mode |
-| urn:upnp-org:serviceId:HVAC_FanOperatingMode1 | FanStatus | fan status |
+| urn:upnp-org:serviceId:HVAC_FanOperatingMode1 | Mode | current fan operating mode |
+| urn:upnp-org:serviceId:HVAC_FanOperatingMode1 | FanStatus | `Off` -- not currently supported |
 | urn:upnp-org:serviceId:HVAC_UserOperatingMode1 | ModeStatus | HVAC mode |
 | urn:micasaverde-com:serviceId:HaDevice1 | LastUpdate | seconds since the Epoch GMT since device updated |
-| urn:micasaverde-com:serviceId:HaDevice1 | CommFailure | 0 if connected, 1 if not |
-| urn:micasaverde-com:serviceId:EnergyMetering1 | UserSuppliedWattage | 0,0,0 |
+| urn:micasaverde-com:serviceId:HaDevice1 | CommFailure | `0` if connected, `1` if not |
+| urn:micasaverde-com:serviceId:EnergyMetering1 | UserSuppliedWattage | `0,0,0` |
 
 ### Humidistats ###
 
@@ -97,7 +97,7 @@ After you have entered the PIN in your My Apps widget at ecobee.com, on the next
 |:-----------|:---------|:------|
 | urn:micasaverde-com:serviceId:HumiditySensor1 | CurrentLevel | current relative humidity percentage |
 | urn:micasaverde-com:serviceId:HaDevice1 | LastUpdate | seconds since the Epoch GMT since device updated |
-| urn:micasaverde-com:serviceId:HaDevice1 | CommFailure | 0 if connected, 1 if not |
+| urn:micasaverde-com:serviceId:HaDevice1 | CommFailure | `0` if connected, `1` if not |
 
 ### Houses ###
 
@@ -106,7 +106,7 @@ After you have entered the PIN in your My Apps widget at ecobee.com, on the next
 | urn:upnp-org:serviceId:HouseStatus1 | OccupancyState | `Occupied` or `Unoccupied` |
 | urn:upnp-org:serviceId:SwitchPower1 | Status | `0` if unoccupied or `1` if occupied |
 | urn:micasaverde-com:serviceId:HaDevice1 | LastUpdate | seconds since the Epoch GMT since device updated |
-| urn:micasaverde-com:serviceId:HaDevice1 | CommFailure | 0 if connected, 1 if not |
+| urn:micasaverde-com:serviceId:HaDevice1 | CommFailure | `0` if connected, `1` if not |
 | urn:ecobee-com:serviceId:Ecobee1 | StreetAddress | The thermostat location street address. _Not kept in sync._ |
 | urn:ecobee-com:serviceId:Ecobee1 | City | The thermostat location city. _Not kept in sync._ |
 | urn:ecobee-com:serviceId:Ecobee1 | ProvinceState | The thermostat location state or province. _Not kept in sync._ |
