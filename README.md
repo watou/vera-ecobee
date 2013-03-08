@@ -17,7 +17,7 @@ This plugin will monitor and control your [ecobee][] thermostat(s) through your 
 
 * Change HVAC mode and set indefinite holds for temperature set points and fan mode, and allow the program to resume from these holds.
 
-* Use a QuickSave-like hold event (for Si thermostats) or SwitchOccupancy event (for EMS thermostats) to set and monitor an "away" state.
+* Use a QuickSave-like hold event (for Smart thermostats) or SwitchOccupancy event (for EMS thermostats) to set and monitor an "away" state.
 
 * Perform common functions, such as sending a text message or resuming the program, to an individual thermostat or a group of thermostats.
 
@@ -39,7 +39,7 @@ Once you see it, you then have ten minutes or less to enter this PIN in the My A
 
 ### Choosing which thermostats to monitor and control ###
 
-_If you are a **non-commercial customer** with one or more ecobee Si thermostats (not EMS model thermostats), the default values should work for you and you can skip this section.  Otherwise, perform this step now._
+_If you are a **non-commercial customer**, the default values should work for you and you can skip this section.  Otherwise, perform this step now._
 
 If you are an Energy Management System (EMS) commercial customer, you must also set values for three variables on the Advanced tab of the ecobee device.
 
@@ -66,7 +66,57 @@ _If you changed the value of the `scope` variable, also completely empty the `au
 
 After you have entered the PIN in your My Apps widget at ecobee.com, on the next polling cycle the plugin will attempt to retrieve information about the thermostats that you specified in the selection criteria above.  The plugin will create a thermostat, humidistat and home/away switch device for each thermostat it discovers.  It will name each device as it is named in the thermostat itself, or if there is no name, it will name the device using the thermostat's unique identifier.  You can change this name in the Advanced tab of the device.
 
-## UPnP actions for ecobee Thermostats ##
+## UPnP variables ##
+
+### ecobee device ###
+
+| Service ID | Variable | Value |
+|:-----------|:---------|:------|
+| urn:ecobee-com:serviceId:Ecobee1 | status | `0` when there is no known session with ecobee.com, `1` otherwise |
+| urn:ecobee-com:serviceId:Ecobee1 | selectionType | Set to `registered`, `thermostats` or `managementSet` per above instructions |
+| urn:ecobee-com:serviceId:Ecobee1 | selectionMatch | Set to a list of thermostat IDs or a manangement set node per above instructions |
+| urn:ecobee-com:serviceId:Ecobee1 | scope | Set to either `smartWrite` or `ems` per above instructions |
+
+### Thermostats ###
+
+| Service ID | Variable | Value |
+|:-----------|:---------|:------|
+| urn:upnp-org:serviceId:TemperatureSensor1 | CurrentTemperature | current temperature in Vera's temperature scale |
+| urn:upnp-org:serviceId:TemperatureSetpoint1_Heat | CurrentSetpoint | current heat setpoint |
+| urn:upnp-org:serviceId:TemperatureSetpoint1_Cool | CurrentSetpoint | current cool setpoint |
+| urn:upnp-org:serviceId:HVAC_FanOperatingMode1 | Mode | fan operating mode |
+| urn:upnp-org:serviceId:HVAC_FanOperatingMode1 | FanStatus | fan status |
+| urn:upnp-org:serviceId:HVAC_UserOperatingMode1 | ModeStatus | HVAC mode |
+| urn:micasaverde-com:serviceId:HaDevice1 | LastUpdate | seconds since the Epoch GMT since device updated |
+| urn:micasaverde-com:serviceId:HaDevice1 | CommFailure | 0 if connected, 1 if not |
+| urn:micasaverde-com:serviceId:EnergyMetering1 | UserSuppliedWattage | 0,0,0 |
+
+### Humidistats ###
+
+| Service ID | Variable | Value |
+|:-----------|:---------|:------|
+| urn:micasaverde-com:serviceId:HumiditySensor1 | CurrentLevel | current relative humidity percentage |
+| urn:micasaverde-com:serviceId:HaDevice1 | LastUpdate | seconds since the Epoch GMT since device updated |
+| urn:micasaverde-com:serviceId:HaDevice1 | CommFailure | 0 if connected, 1 if not |
+
+### Houses ###
+
+| Service ID | Variable | Value |
+|:-----------|:---------|:------|
+| urn:upnp-org:serviceId:HouseStatus1 | OccupancyState | `Occupied` or `Unoccupied` |
+| urn:upnp-org:serviceId:SwitchPower1 | Status | `0` if unoccupied or `1` if occupied |
+| urn:micasaverde-com:serviceId:HaDevice1 | LastUpdate | seconds since the Epoch GMT since device updated |
+| urn:micasaverde-com:serviceId:HaDevice1 | CommFailure | 0 if connected, 1 if not |
+| urn:ecobee-com:serviceId:Ecobee1 | StreetAddress | The thermostat location street address. _Not kept in sync._ |
+| urn:ecobee-com:serviceId:Ecobee1 | City | The thermostat location city. _Not kept in sync._ |
+| urn:ecobee-com:serviceId:Ecobee1 | ProvinceState | The thermostat location state or province. _Not kept in sync._ |
+| urn:ecobee-com:serviceId:Ecobee1 | Country | The thermostat location country. _Not kept in sync._ |
+| urn:ecobee-com:serviceId:Ecobee1 | PostalCode | The thermostat location ZIP or Postal code. _Not kept in sync._ |
+| urn:ecobee-com:serviceId:Ecobee1 | PhoneNumber | The thermostat owner's phone number. _Not kept in sync._ |
+| urn:ecobee-com:serviceId:Ecobee1 | MapCoordinates | The lat/long geographic coordinates of the thermostat location. _Not kept in sync._ |
+
+
+## UPnP actions ##
 
 In addition to the standard thermostat actions, your Vera automation triggers can also perform the following actions on a specific thermostat.  The main ecobee device also implements these actions, in which case the action is applied to all thermostats that match the `selectionType` and `selectionMatch` you specified above.
 
