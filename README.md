@@ -68,16 +68,15 @@ _If you changed the value of the `scope` variable, also completely empty the `au
 
 After you have entered the PIN in your My Apps widget at ecobee.com, on the next polling cycle the plugin will attempt to retrieve information about the thermostats that you specified in the selection criteria above.  The plugin will create a thermostat, humidistat and home/away switch device for each thermostat it discovers.  It will name each device as it is named in the thermostat itself, or if there is no name, it will name the device using the thermostat's unique identifier.  You can change this name in the Advanced tab of the device.
 
-## UPnP variables ##
+## UPnP Devices ##
+
+This plugin creates four different kinds of devices in Vera.  The ecobee device is the parent device of the other device types, and will create and delete them as they appear and disappear from your ecobee.com account.
 
 ### ecobee device ###
 
-Device type:
-
-`urn:schemas-ecobee-com:device:Ecobee:1`
+Device type: `urn:schemas-ecobee-com:device:Ecobee:1`
 
 Implements these services:
-
 * `urn:ecobee-com:serviceId:Ecobee1`
 
 Variables:
@@ -91,12 +90,9 @@ Variables:
 
 ### Thermostat ###
 
-Device type:
-
-`urn:schemas-upnp-org:device:HVAC_ZoneThermostat:1`
+Device type: `urn:schemas-upnp-org:device:HVAC_ZoneThermostat:1`
 
 Implements these services:
-
 * `urn:upnp-org:serviceId:HVAC_FanOperatingMode1`
 * `urn:upnp-org:serviceId:HVAC_UserOperatingMode1`
 * `urn:upnp-org:serviceId:TemperatureSensor1`
@@ -122,12 +118,9 @@ Variables:
 
 ### Humidistat ###
 
-Device type:
-
-`urn:schemas-ecobee-com:device:EcobeeHumidistat:1`
+Device type: `urn:schemas-ecobee-com:device:EcobeeHumidistat:1`
 
 Implements these services:
-
 * `urn:micasaverde-com:serviceId:HumiditySensor1`
 * `urn:micasaverde-com:serviceId:HaDevice1`
 * `urn:ecobee-com:serviceId:Ecobee1`
@@ -142,12 +135,9 @@ Variables:
 
 ### House ###
 
-Device type: 
-
-`urn:schemas-ecobee-com:device:EcobeeHouse:1`
+Device type: `urn:schemas-ecobee-com:device:EcobeeHouse:1`
 
 Implements these services:
-
 * `urn:upnp-org:serviceId:HouseStatus1`
 * `urn:upnp-org:serviceId:SwitchPower1`
 * `urn:micasaverde-com:serviceId:HaDevice1`
@@ -171,7 +161,7 @@ Variables:
 | urn:ecobee-com:serviceId:Ecobee1 | MapCoordinates | The lat/long geographic coordinates of the thermostat location. |
 
 
-## UPnP actions ##
+## UPnP Actions ##
 
 In addition to the standard thermostat actions, your Vera automation can also perform the following actions on a specific thermostat.  The main ecobee device also implements these actions, in which case the action is applied to all thermostats that match the `selectionType` and `selectionMatch` you specified above.
 
