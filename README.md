@@ -35,7 +35,9 @@ Upon installing the ecobee plugin, it will attempt to connect with the ecobee.co
 
 ![ecobee device prompting to register PIN at ecobee.com](http://cocu.la/vera/ecobee/images/shot2b.jpg)
 
-Once you see it, you then have ten minutes or less to enter this PIN in the My Apps widget in your ecobee.com web portal.  (Also, you may want to mark your calendar for next year because this PIN authorization expires after one year.  External events may also invalidate the authorization sooner, which will trigger the PIN request process again.)
+Once you see it, you then have ten minutes or less to enter this PIN in the My Apps widget in your ecobee.com web portal.  If the PIN expires, the plugin will request and present a new PIN.
+
+Also, you may want to mark your calendar for next year because this authorization expires after one year.  External events may also invalidate the authorization sooner, which will trigger the PIN request process again.
 
 ### Choosing which thermostats to monitor and control ###
 
@@ -72,7 +74,7 @@ After you have entered the PIN in your My Apps widget at ecobee.com, on the next
 
 | Service ID | Variable | Value |
 |:-----------|:---------|:------|
-| urn:ecobee-com:serviceId:Ecobee1 | status | `0` when there is no known session with ecobee.com, `1` otherwise |
+| urn:ecobee-com:serviceId:Ecobee1 | status | `0` when there is no valid access token for ecobee.com, `1` otherwise |
 | urn:ecobee-com:serviceId:Ecobee1 | selectionType | Set to `registered`, `thermostats` or `managementSet` per above instructions |
 | urn:ecobee-com:serviceId:Ecobee1 | selectionMatch | Set to a list of thermostat IDs or a manangement set node per above instructions |
 | urn:ecobee-com:serviceId:Ecobee1 | scope | Set to either `smartWrite` or `ems` per above instructions |
@@ -139,7 +141,7 @@ Send a text message to a thermostat's display screen.  The text message can be u
 
 * Only works with Vera UI5 1.5.408 or later.
 
-* Updates to the state of thermostat and humidistat devices can take up to the polling number of seconds (120 by default) to be reflected in the UPnP devices (or as quickly as 5 seconds).
+* Updates to the state of thermostat and humidistat devices can take up to the polling number of seconds (60 by default) to be reflected in the UPnP devices (or as quickly as 5 seconds).
 
 * One Vera will only maintain a single ecobee.com authentication, so creating multiple instances of the ecobee device will not request multiple PINs for authentication.  This means that a single Vera cannot be used to manage instances of the ecobee device authenticated against multiple ecobee.com accounts.  The other choice was to require that each instance of the ecobee device request a PIN against all different ecobee.com user accounts, which seemed less useful in practice.  So the only scenario that works currently is where a single ecobee.com user wants to authenticate a single Vera, and on that Vera, there can be multiple instances of the ecobee device connected to the same ecobee.com user account (but with different selectionMatches specified in the Advanced tab variables to make doing so useful).  Please contact [me][] if your requirements differ.
 
