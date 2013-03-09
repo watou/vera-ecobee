@@ -72,6 +72,16 @@ After you have entered the PIN in your My Apps widget at ecobee.com, on the next
 
 ### ecobee device ###
 
+Device type:
+
+`urn:schemas-ecobee-com:device:Ecobee:1`
+
+Implements these services:
+
+* `urn:ecobee-com:serviceId:Ecobee1`
+
+Variables:
+
 | Service ID | Variable | Value |
 |:-----------|:---------|:------|
 | urn:ecobee-com:serviceId:Ecobee1 | status | `0` when there is no valid access token for ecobee.com, `1` otherwise |
@@ -79,7 +89,24 @@ After you have entered the PIN in your My Apps widget at ecobee.com, on the next
 | urn:ecobee-com:serviceId:Ecobee1 | selectionMatch | Set to a list of thermostat IDs or a manangement set node per above instructions |
 | urn:ecobee-com:serviceId:Ecobee1 | scope | Set to either `smartWrite` or `ems` per above instructions |
 
-### Thermostats ###
+### Thermostat ###
+
+Device type:
+
+`urn:schemas-upnp-org:device:HVAC_ZoneThermostat:1`
+
+Implements these services:
+
+* `urn:upnp-org:serviceId:HVAC_FanOperatingMode1`
+* `urn:upnp-org:serviceId:HVAC_UserOperatingMode1`
+* `urn:upnp-org:serviceId:TemperatureSensor1`
+* `urn:upnp-org:serviceId:TemperatureSetpoint1_Heat`
+* `urn:upnp-org:serviceId:TemperatureSetpoint1_Cool`
+* `urn:micasaverde-com:serviceId:EnergyMetering1`
+* `urn:micasaverde-com:serviceId:HaDevice1`
+* `urn:ecobee-com:serviceId:Ecobee1`
+
+Variables:
 
 | Service ID | Variable | Value |
 |:-----------|:---------|:------|
@@ -93,7 +120,19 @@ After you have entered the PIN in your My Apps widget at ecobee.com, on the next
 | urn:micasaverde-com:serviceId:HaDevice1 | CommFailure | `0` if connected, `1` if not |
 | urn:micasaverde-com:serviceId:EnergyMetering1 | UserSuppliedWattage | `0,0,0` |
 
-### Humidistats ###
+### Humidistat ###
+
+Device type:
+
+`urn:schemas-ecobee-com:device:EcobeeHumidistat:1`
+
+Implements these services:
+
+* `urn:micasaverde-com:serviceId:HumiditySensor1`
+* `urn:micasaverde-com:serviceId:HaDevice1`
+* `urn:ecobee-com:serviceId:Ecobee1`
+
+Variables:
 
 | Service ID | Variable | Value |
 |:-----------|:---------|:------|
@@ -101,7 +140,20 @@ After you have entered the PIN in your My Apps widget at ecobee.com, on the next
 | urn:micasaverde-com:serviceId:HaDevice1 | LastUpdate | seconds since the Epoch GMT since device updated |
 | urn:micasaverde-com:serviceId:HaDevice1 | CommFailure | `0` if connected, `1` if not |
 
-### Houses ###
+### House ###
+
+Device type: 
+
+`urn:schemas-ecobee-com:device:EcobeeHouse:1`
+
+Implements these services:
+
+* `urn:upnp-org:serviceId:HouseStatus1`
+* `urn:upnp-org:serviceId:SwitchPower1`
+* `urn:micasaverde-com:serviceId:HaDevice1`
+* `urn:ecobee-com:serviceId:Ecobee1`
+
+Variables:
 
 | Service ID | Variable | Value |
 |:-----------|:---------|:------|
@@ -109,18 +161,19 @@ After you have entered the PIN in your My Apps widget at ecobee.com, on the next
 | urn:upnp-org:serviceId:SwitchPower1 | Status | `0` if unoccupied or `1` if occupied |
 | urn:micasaverde-com:serviceId:HaDevice1 | LastUpdate | seconds since the Epoch GMT since device updated |
 | urn:micasaverde-com:serviceId:HaDevice1 | CommFailure | `0` if connected, `1` if not |
-| urn:ecobee-com:serviceId:Ecobee1 | StreetAddress | The thermostat location street address. _Not kept in sync._ |
-| urn:ecobee-com:serviceId:Ecobee1 | City | The thermostat location city. _Not kept in sync._ |
-| urn:ecobee-com:serviceId:Ecobee1 | ProvinceState | The thermostat location state or province. _Not kept in sync._ |
-| urn:ecobee-com:serviceId:Ecobee1 | Country | The thermostat location country. _Not kept in sync._ |
-| urn:ecobee-com:serviceId:Ecobee1 | PostalCode | The thermostat location ZIP or Postal code. _Not kept in sync._ |
-| urn:ecobee-com:serviceId:Ecobee1 | PhoneNumber | The thermostat owner's phone number. _Not kept in sync._ |
-| urn:ecobee-com:serviceId:Ecobee1 | MapCoordinates | The lat/long geographic coordinates of the thermostat location. _Not kept in sync._ |
+| _The following variables are only set when the device is first created, and are not kept in sync if they are changed.  This is done in order to conserve bandwidth and processing time.  Delete the device if you wish it to be re-created with current values._ |
+| urn:ecobee-com:serviceId:Ecobee1 | StreetAddress | The thermostat location street address. |
+| urn:ecobee-com:serviceId:Ecobee1 | City | The thermostat location city. |
+| urn:ecobee-com:serviceId:Ecobee1 | ProvinceState | The thermostat location state or province. |
+| urn:ecobee-com:serviceId:Ecobee1 | Country | The thermostat location country. |
+| urn:ecobee-com:serviceId:Ecobee1 | PostalCode | The thermostat location ZIP or Postal code. |
+| urn:ecobee-com:serviceId:Ecobee1 | PhoneNumber | The thermostat owner's phone number. |
+| urn:ecobee-com:serviceId:Ecobee1 | MapCoordinates | The lat/long geographic coordinates of the thermostat location. |
 
 
 ## UPnP actions ##
 
-In addition to the standard thermostat actions, your Vera automation triggers can also perform the following actions on a specific thermostat.  The main ecobee device also implements these actions, in which case the action is applied to all thermostats that match the `selectionType` and `selectionMatch` you specified above.
+In addition to the standard thermostat actions, your Vera automation can also perform the following actions on a specific thermostat.  The main ecobee device also implements these actions, in which case the action is applied to all thermostats that match the `selectionType` and `selectionMatch` you specified above.
 
 ### ResumeProgram ###
 
