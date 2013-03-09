@@ -14,11 +14,8 @@ This plugin will monitor and control your [ecobee][] thermostat(s) through your 
 ## Features ##
 
 * Monitor thermostat mode, fan mode, current and set point temperatures, humidity level, current event (if any) and current climate.
-
 * Change HVAC mode and set indefinite holds for temperature set points and fan mode, and allow the program to resume from these holds.
-
 * Use a QuickSave-like hold event (for Smart thermostats) or SwitchOccupancy event (for EMS thermostats) to set and monitor an "away" state.
-
 * Perform common functions, such as sending a text message or resuming the program, to an individual thermostat or a group of thermostats.
 
 ## How to Use the Plugin ##
@@ -77,6 +74,7 @@ This plugin creates four different kinds of devices in Vera.  The ecobee device 
 Device type: `urn:schemas-ecobee-com:device:Ecobee:1`
 
 Implements these services:
+
 * `urn:ecobee-com:serviceId:Ecobee1`
 
 Variables:
@@ -93,6 +91,7 @@ Variables:
 Device type: `urn:schemas-upnp-org:device:HVAC_ZoneThermostat:1`
 
 Implements these services:
+
 * `urn:upnp-org:serviceId:HVAC_FanOperatingMode1`
 * `urn:upnp-org:serviceId:HVAC_UserOperatingMode1`
 * `urn:upnp-org:serviceId:TemperatureSensor1`
@@ -121,6 +120,7 @@ Variables:
 Device type: `urn:schemas-ecobee-com:device:EcobeeHumidistat:1`
 
 Implements these services:
+
 * `urn:micasaverde-com:serviceId:HumiditySensor1`
 * `urn:micasaverde-com:serviceId:HaDevice1`
 * `urn:ecobee-com:serviceId:Ecobee1`
@@ -138,6 +138,7 @@ Variables:
 Device type: `urn:schemas-ecobee-com:device:EcobeeHouse:1`
 
 Implements these services:
+
 * `urn:upnp-org:serviceId:HouseStatus1`
 * `urn:upnp-org:serviceId:SwitchPower1`
 * `urn:micasaverde-com:serviceId:HaDevice1`
