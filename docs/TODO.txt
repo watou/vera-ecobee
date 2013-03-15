@@ -1,0 +1,32 @@
+
+
+Bugs
+====
+
+- setting a hold while in QuickSave just pushes the hold on top of the QuickSave, so that when
+  the hold is resumed, we're back to the QuickSave.  Verify with logging, but if so, need to
+  have "Home" action repeatedly pop events off the stack until the quickSave is popped off.
+  Also, calculating isAway() must change to account for quickSave being somewhere in the stack.
+  Think about this.
+- Obscure app_key so no one can pirate it
+- Enable/disable Resume button based on presence of resume-able events.
+- Find out if HaDevice "Commands" is usable while the device is up and running
+
+Testing
+=======
+- It's not the "ems" account type to be concerned with, it's the actual model of the thermostat! (Right?)
+- Catch when getting tokens fails because the PIN expired, so we can get a new PIN.
+
+
+Enhancements
+============
+
+- Add `UniqueAccount` to ecobee device variables.  Defaults to `0`, meaning that this instance of the
+  ecobee device will try to use another shared instance's `auth_token` if available, instead of requesting
+  a new `auth_token`.  If there are no other `UniqueAccount=0` instances, this instance will make a PIN
+  request.  Whichever account grants this PIN request will invalidate any previous grants.  If
+  `UniqueAccount` is set to `1`, it means that this instance of the ecobee device will *not* pull some other
+  instance's `auth_token`, nor share its own auth_token with other instances.  This will allow a mix of 
+  shared and private `auth_token`s across multiple instances of the ecobee device.
+
+

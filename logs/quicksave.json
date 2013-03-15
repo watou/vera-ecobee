@@ -1,0 +1,501 @@
+>>> Thu Feb 28 18:09:13 2013
+User-Agent ecobee-lua-api/1.0
+Authorization Bearer rpxeR9WASFNtnCapsEzNok1nvqO6BF5m
+Content-Type application/json;charset=UTF-8
+Accept application/json
+Thu Feb 28 18:09:13 2013 >>> GET /home/api/1/thermostatSummary?token=rpxeR9WASFNtnCapsEzNok1nvqO6BF5m&json={"selection":{"selectionMatch":"","selectionType":"registered"}}
+<<< 200 HTTP/1.1 200 OK
+{
+  "thermostatCount": 1,
+  "revisionList": [
+    "276075659054:Second Floor:true:130228212207:080102000000:130228225503"
+  ],
+  "status": {
+    "code": 0,
+    "message": ""
+  }
+}
+>>> Thu Feb 28 18:10:13 2013
+User-Agent ecobee-lua-api/1.0
+Authorization Bearer rpxeR9WASFNtnCapsEzNok1nvqO6BF5m
+Content-Type application/json;charset=UTF-8
+Accept application/json
+Thu Feb 28 18:10:13 2013 >>> GET /home/api/1/thermostatSummary?token=rpxeR9WASFNtnCapsEzNok1nvqO6BF5m&json={"selection":{"selectionMatch":"","selectionType":"registered"}}
+<<< 200 HTTP/1.1 200 OK
+{
+  "thermostatCount": 1,
+  "revisionList": [
+    "276075659054:Second Floor:true:130228231003:080102000000:130228231003"
+  ],
+  "status": {
+    "code": 0,
+    "message": ""
+  }
+}
+>>> Thu Feb 28 18:10:14 2013
+User-Agent ecobee-lua-api/1.0
+Authorization Bearer rpxeR9WASFNtnCapsEzNok1nvqO6BF5m
+Content-Type application/json;charset=UTF-8
+Accept application/json
+Thu Feb 28 18:10:14 2013 >>> GET /home/api/1/thermostat?token=rpxeR9WASFNtnCapsEzNok1nvqO6BF5m&json={"selection":{"includeWeather":false,"includeAlerts":false,"includeRuntime":true,"includeProgram":false,"selectionMatch":"276075659054","includeSettings":true,"includeEvents":true,"selectionType":"thermostats"}}
+<<< 200 HTTP/1.1 200 OK
+{
+  "page": {
+    "page": 1,
+    "totalPages": 1,
+    "pageSize": 1,
+    "total": 1
+  },
+  "thermostatList": [
+    {
+      "identifier": "276075659054",
+      "name": "Second Floor",
+      "thermostatRev": "130228231003",
+      "isRegistered": true,
+      "modelNumber": "siSmart",
+      "lastModified": "2013-02-28 23:10:03",
+      "thermostatTime": "2013-02-28 18:10:13",
+      "utcTime": "2013-02-28 23:10:13",
+      "settings": {
+        "hvacMode": "heat",
+        "lastServiceDate": "2013-02-11",
+        "serviceRemindMe": false,
+        "monthsBetweenService": 6,
+        "remindMeDate": "2013-02-11",
+        "vent": "off",
+        "ventilatorMinOnTime": 20,
+        "serviceRemindTechnician": false,
+        "eiLocation": "",
+        "coldTempAlert": 500,
+        "coldTempAlertEnabled": true,
+        "hotTempAlert": 920,
+        "hotTempAlertEnabled": true,
+        "coolStages": 1,
+        "heatStages": 1,
+        "maxSetBack": 100,
+        "maxSetForward": 80,
+        "quickSaveSetBack": 40,
+        "quickSaveSetForward": 40,
+        "statusIntervalSeconds": 900,
+        "hasHeatPump": false,
+        "hasForcedAir": true,
+        "hasBoiler": false,
+        "hasHumidifier": false,
+        "hasErv": false,
+        "hasHrv": false,
+        "condensationAvoid": false,
+        "useCelsius": false,
+        "useTimeFormat12": true,
+        "locale": "en",
+        "humidity": "-5002",
+        "humidifierMode": "off",
+        "backlightOnIntensity": 10,
+        "backlightSleepIntensity": 1,
+        "backlightOffTime": 60,
+        "soundTickVolume": 0,
+        "soundAlertVolume": 10,
+        "compressorProtectionMinTime": 300,
+        "compressorProtectionMinTemp": -10000,
+        "stage1HeatingDifferentialTemp": 5,
+        "stage1CoolingDifferentialTemp": 5,
+        "stage1HeatingDissipationTime": 30,
+        "stage1CoolingDissipationTime": 30,
+        "heatPumpReversalOnCool": true,
+        "fanControlRequired": false,
+        "fanMinOnTime": 0,
+        "heatCoolMinDelta": 50,
+        "tempCorrection": 0,
+        "holdAction": "useEndTime",
+        "heatPumpGroundWater": false,
+        "hasElectric": false,
+        "hasDehumidifier": false,
+        "dehumidifierMode": "off",
+        "dehumidifierLevel": 60,
+        "dehumidifyWithAC": true,
+        "autoHeatCoolFeatureEnabled": true,
+        "coldTempAlertNotify": true,
+        "hotTempAlertNotify": true,
+        "coldTempAlertNotifyTechnician": false,
+        "hotTempAlertNotifyTechnician": false,
+        "wifiOfflineAlert": false,
+        "heatMinTemp": 450,
+        "heatMaxTemp": 790,
+        "coolMinTemp": 450,
+        "coolMaxTemp": 920,
+        "heatRangeHigh": 790,
+        "heatRangeLow": 450,
+        "coolRangeHigh": 920,
+        "coolRangeLow": 650,
+        "userAccessCode": "",
+        "userAccessSetting": 0,
+        "auxRuntimeAlert": 10800,
+        "auxOutdoorTempAlert": 500,
+        "auxMaxOutdoorTemp": 700,
+        "auxRuntimeAlertNotify": false,
+        "auxOutdoorTempAlertNotify": false,
+        "auxRuntimeAlertNotifyTechnician": false,
+        "auxOutdoorTempAlertNotifyTechnician": false,
+        "disablePreHeating": false,
+        "disablePreCooling": false,
+        "installerCodeRequired": false,
+        "drAccept": "always",
+        "isRentalProperty": false,
+        "useZoneController": false,
+        "randomStartDelayCool": 0,
+        "randomStartDelayHeat": 0,
+        "humidityHighAlert": -1,
+        "humidityLowAlert": -1,
+        "disableHeatPumpAlerts": false,
+        "compressorGenerateHeatingAlert": false,
+        "compressorGenerateCoolingAlert": false,
+        "disableAlertsOnIdt": false,
+        "humidityAlertNotify": false,
+        "humidityAlertNotifyTechnician": false,
+        "tempAlertNotify": true,
+        "tempAlertNotifyTechnician": false,
+        "monthlyElectricityBillLimit": 0,
+        "enableElectricityBillAlert": false,
+        "enableProjectedElectricityBillAlert": false,
+        "elecricityBillingDayOfMonth": 1,
+        "electricityBillCycleMonths": 1,
+        "electricityBillStartMonth": 0
+      },
+      "runtime": {
+        "connected": true,
+        "firstConnected": "2013-02-13 20:56:19",
+        "connectDateTime": "2013-02-28 23:10:03",
+        "disconnectDateTime": "2013-02-14 00:00:00",
+        "lastModified": "2013-02-28 23:10:03",
+        "lastStatusModified": "2013-02-28 23:10:03",
+        "actualTemperature": 718,
+        "actualHumidity": 34,
+        "desiredHeat": 660,
+        "desiredCool": 820,
+        "desiredHumidity": -5002,
+        "desiredDehumidity": -5002
+      },
+      "events": [
+        {
+          "type": "quickSave",
+          "name": "QuickSave",
+          "running": false,
+          "startDate": "2013-02-28",
+          "startTime": "18:10:03",
+          "endDate": "2035-01-01",
+          "endTime": "06:10:03",
+          "isOccupied": false,
+          "isCoolOff": false,
+          "isHeatOff": false,
+          "coolHoldTemp": 820,
+          "heatHoldTemp": 660,
+          "fan": "auto",
+          "vent": "off",
+          "ventilatorMinOnTime": 5,
+          "isOptional": true,
+          "isTemperatureRelative": false,
+          "coolRelativeTemp": 40,
+          "heatRelativeTemp": 40,
+          "isTemperatureAbsolute": true,
+          "dutyCyclePercentage": 255,
+          "fanMinOnTime": 0,
+          "occupiedSensorActive": false,
+          "unoccupiedSensorActive": false,
+          "drRampUpTemp": 3600,
+          "drRampUpTime": 3600,
+          "linkRef": ""
+        }
+      ]
+    }
+  ],
+  "status": {
+    "code": 0,
+    "message": ""
+  }
+}
+>>> Thu Feb 28 18:11:15 2013
+User-Agent ecobee-lua-api/1.0
+Authorization Bearer rpxeR9WASFNtnCapsEzNok1nvqO6BF5m
+Content-Type application/json;charset=UTF-8
+Accept application/json
+Thu Feb 28 18:11:15 2013 >>> GET /home/api/1/thermostatSummary?token=rpxeR9WASFNtnCapsEzNok1nvqO6BF5m&json={"selection":{"selectionMatch":"","selectionType":"registered"}}
+<<< 200 HTTP/1.1 200 OK
+{
+  "thermostatCount": 1,
+  "revisionList": [
+    "276075659054:Second Floor:true:130228231056:080102000000:130228231003"
+  ],
+  "status": {
+    "code": 0,
+    "message": ""
+  }
+}
+>>> Thu Feb 28 18:11:15 2013
+User-Agent ecobee-lua-api/1.0
+Authorization Bearer rpxeR9WASFNtnCapsEzNok1nvqO6BF5m
+Content-Type application/json;charset=UTF-8
+Accept application/json
+Thu Feb 28 18:11:15 2013 >>> GET /home/api/1/thermostat?token=rpxeR9WASFNtnCapsEzNok1nvqO6BF5m&json={"selection":{"includeWeather":false,"includeAlerts":false,"includeRuntime":true,"includeProgram":false,"selectionMatch":"276075659054","includeSettings":true,"includeEvents":true,"selectionType":"thermostats"}}
+<<< 200 HTTP/1.1 200 OK
+{
+  "page": {
+    "page": 1,
+    "totalPages": 1,
+    "pageSize": 1,
+    "total": 1
+  },
+  "thermostatList": [
+    {
+      "identifier": "276075659054",
+      "name": "Second Floor",
+      "thermostatRev": "130228231056",
+      "isRegistered": true,
+      "modelNumber": "siSmart",
+      "lastModified": "2013-02-28 23:10:56",
+      "thermostatTime": "2013-02-28 18:11:15",
+      "utcTime": "2013-02-28 23:11:15",
+      "settings": {
+        "hvacMode": "heat",
+        "lastServiceDate": "2013-02-11",
+        "serviceRemindMe": false,
+        "monthsBetweenService": 6,
+        "remindMeDate": "2013-02-11",
+        "vent": "off",
+        "ventilatorMinOnTime": 20,
+        "serviceRemindTechnician": false,
+        "eiLocation": "",
+        "coldTempAlert": 500,
+        "coldTempAlertEnabled": true,
+        "hotTempAlert": 920,
+        "hotTempAlertEnabled": true,
+        "coolStages": 1,
+        "heatStages": 1,
+        "maxSetBack": 100,
+        "maxSetForward": 80,
+        "quickSaveSetBack": 40,
+        "quickSaveSetForward": 40,
+        "statusIntervalSeconds": 900,
+        "hasHeatPump": false,
+        "hasForcedAir": true,
+        "hasBoiler": false,
+        "hasHumidifier": false,
+        "hasErv": false,
+        "hasHrv": false,
+        "condensationAvoid": false,
+        "useCelsius": false,
+        "useTimeFormat12": true,
+        "locale": "en",
+        "humidity": "-5002",
+        "humidifierMode": "off",
+        "backlightOnIntensity": 10,
+        "backlightSleepIntensity": 1,
+        "backlightOffTime": 60,
+        "soundTickVolume": 0,
+        "soundAlertVolume": 10,
+        "compressorProtectionMinTime": 300,
+        "compressorProtectionMinTemp": -10000,
+        "stage1HeatingDifferentialTemp": 5,
+        "stage1CoolingDifferentialTemp": 5,
+        "stage1HeatingDissipationTime": 30,
+        "stage1CoolingDissipationTime": 30,
+        "heatPumpReversalOnCool": true,
+        "fanControlRequired": false,
+        "fanMinOnTime": 0,
+        "heatCoolMinDelta": 50,
+        "tempCorrection": 0,
+        "holdAction": "useEndTime",
+        "heatPumpGroundWater": false,
+        "hasElectric": false,
+        "hasDehumidifier": false,
+        "dehumidifierMode": "off",
+        "dehumidifierLevel": 60,
+        "dehumidifyWithAC": true,
+        "autoHeatCoolFeatureEnabled": true,
+        "coldTempAlertNotify": true,
+        "hotTempAlertNotify": true,
+        "coldTempAlertNotifyTechnician": false,
+        "hotTempAlertNotifyTechnician": false,
+        "wifiOfflineAlert": false,
+        "heatMinTemp": 450,
+        "heatMaxTemp": 790,
+        "coolMinTemp": 450,
+        "coolMaxTemp": 920,
+        "heatRangeHigh": 790,
+        "heatRangeLow": 450,
+        "coolRangeHigh": 920,
+        "coolRangeLow": 650,
+        "userAccessCode": "",
+        "userAccessSetting": 0,
+        "auxRuntimeAlert": 10800,
+        "auxOutdoorTempAlert": 500,
+        "auxMaxOutdoorTemp": 700,
+        "auxRuntimeAlertNotify": false,
+        "auxOutdoorTempAlertNotify": false,
+        "auxRuntimeAlertNotifyTechnician": false,
+        "auxOutdoorTempAlertNotifyTechnician": false,
+        "disablePreHeating": false,
+        "disablePreCooling": false,
+        "installerCodeRequired": false,
+        "drAccept": "always",
+        "isRentalProperty": false,
+        "useZoneController": false,
+        "randomStartDelayCool": 0,
+        "randomStartDelayHeat": 0,
+        "humidityHighAlert": -1,
+        "humidityLowAlert": -1,
+        "disableHeatPumpAlerts": false,
+        "compressorGenerateHeatingAlert": false,
+        "compressorGenerateCoolingAlert": false,
+        "disableAlertsOnIdt": false,
+        "humidityAlertNotify": false,
+        "humidityAlertNotifyTechnician": false,
+        "tempAlertNotify": true,
+        "tempAlertNotifyTechnician": false,
+        "monthlyElectricityBillLimit": 0,
+        "enableElectricityBillAlert": false,
+        "enableProjectedElectricityBillAlert": false,
+        "elecricityBillingDayOfMonth": 1,
+        "electricityBillCycleMonths": 1,
+        "electricityBillStartMonth": 0
+      },
+      "runtime": {
+        "connected": true,
+        "firstConnected": "2013-02-13 20:56:19",
+        "connectDateTime": "2013-02-28 23:10:03",
+        "disconnectDateTime": "2013-02-14 00:00:00",
+        "lastModified": "2013-02-28 23:10:56",
+        "lastStatusModified": "2013-02-28 23:10:03",
+        "actualTemperature": 718,
+        "actualHumidity": 34,
+        "desiredHeat": 700,
+        "desiredCool": 780,
+        "desiredHumidity": -5002,
+        "desiredDehumidity": -5002
+      },
+      "events": []
+    }
+  ],
+  "status": {
+    "code": 0,
+    "message": ""
+  }
+}
+>>> Thu Feb 28 18:12:16 2013
+User-Agent ecobee-lua-api/1.0
+Authorization Bearer rpxeR9WASFNtnCapsEzNok1nvqO6BF5m
+Content-Type application/json;charset=UTF-8
+Accept application/json
+Thu Feb 28 18:12:16 2013 >>> GET /home/api/1/thermostatSummary?token=rpxeR9WASFNtnCapsEzNok1nvqO6BF5m&json={"selection":{"selectionMatch":"","selectionType":"registered"}}
+<<< 200 HTTP/1.1 200 OK
+{
+  "thermostatCount": 1,
+  "revisionList": [
+    "276075659054:Second Floor:true:130228231056:080102000000:130228231003"
+  ],
+  "status": {
+    "code": 0,
+    "message": ""
+  }
+}
+>>> Thu Feb 28 18:13:16 2013
+User-Agent ecobee-lua-api/1.0
+Authorization Bearer rpxeR9WASFNtnCapsEzNok1nvqO6BF5m
+Content-Type application/json;charset=UTF-8
+Accept application/json
+Thu Feb 28 18:13:16 2013 >>> GET /home/api/1/thermostatSummary?token=rpxeR9WASFNtnCapsEzNok1nvqO6BF5m&json={"selection":{"selectionMatch":"","selectionType":"registered"}}
+<<< 200 HTTP/1.1 200 OK
+{
+  "thermostatCount": 1,
+  "revisionList": [
+    "276075659054:Second Floor:true:130228231056:080102000000:130228231003"
+  ],
+  "status": {
+    "code": 0,
+    "message": ""
+  }
+}
+>>> Thu Feb 28 18:14:16 2013
+User-Agent ecobee-lua-api/1.0
+Authorization Bearer rpxeR9WASFNtnCapsEzNok1nvqO6BF5m
+Content-Type application/json;charset=UTF-8
+Accept application/json
+Thu Feb 28 18:14:16 2013 >>> GET /home/api/1/thermostatSummary?token=rpxeR9WASFNtnCapsEzNok1nvqO6BF5m&json={"selection":{"selectionMatch":"","selectionType":"registered"}}
+<<< 200 HTTP/1.1 200 OK
+{
+  "thermostatCount": 1,
+  "revisionList": [
+    "276075659054:Second Floor:true:130228231056:080102000000:130228231003"
+  ],
+  "status": {
+    "code": 0,
+    "message": ""
+  }
+}
+>>> Thu Feb 28 18:15:16 2013
+User-Agent ecobee-lua-api/1.0
+Authorization Bearer rpxeR9WASFNtnCapsEzNok1nvqO6BF5m
+Content-Type application/json;charset=UTF-8
+Accept application/json
+Thu Feb 28 18:15:16 2013 >>> GET /home/api/1/thermostatSummary?token=rpxeR9WASFNtnCapsEzNok1nvqO6BF5m&json={"selection":{"selectionMatch":"","selectionType":"registered"}}
+<<< 200 HTTP/1.1 200 OK
+{
+  "thermostatCount": 1,
+  "revisionList": [
+    "276075659054:Second Floor:true:130228231056:080102000000:130228231003"
+  ],
+  "status": {
+    "code": 0,
+    "message": ""
+  }
+}
+>>> Thu Feb 28 18:16:16 2013
+User-Agent ecobee-lua-api/1.0
+Authorization Bearer rpxeR9WASFNtnCapsEzNok1nvqO6BF5m
+Content-Type application/json;charset=UTF-8
+Accept application/json
+Thu Feb 28 18:16:16 2013 >>> GET /home/api/1/thermostatSummary?token=rpxeR9WASFNtnCapsEzNok1nvqO6BF5m&json={"selection":{"selectionMatch":"","selectionType":"registered"}}
+<<< 200 HTTP/1.1 200 OK
+{
+  "thermostatCount": 1,
+  "revisionList": [
+    "276075659054:Second Floor:true:130228231056:080102000000:130228231003"
+  ],
+  "status": {
+    "code": 0,
+    "message": ""
+  }
+}
+>>> Thu Feb 28 18:17:16 2013
+User-Agent ecobee-lua-api/1.0
+Authorization Bearer rpxeR9WASFNtnCapsEzNok1nvqO6BF5m
+Content-Type application/json;charset=UTF-8
+Accept application/json
+Thu Feb 28 18:17:16 2013 >>> GET /home/api/1/thermostatSummary?token=rpxeR9WASFNtnCapsEzNok1nvqO6BF5m&json={"selection":{"selectionMatch":"","selectionType":"registered"}}
+<<< 200 HTTP/1.1 200 OK
+{
+  "thermostatCount": 1,
+  "revisionList": [
+    "276075659054:Second Floor:true:130228231056:080102000000:130228231003"
+  ],
+  "status": {
+    "code": 0,
+    "message": ""
+  }
+}
+>>> Thu Feb 28 18:18:16 2013
+User-Agent ecobee-lua-api/1.0
+Authorization Bearer rpxeR9WASFNtnCapsEzNok1nvqO6BF5m
+Content-Type application/json;charset=UTF-8
+Accept application/json
+Thu Feb 28 18:18:16 2013 >>> GET /home/api/1/thermostatSummary?token=rpxeR9WASFNtnCapsEzNok1nvqO6BF5m&json={"selection":{"selectionMatch":"","selectionType":"registered"}}
+<<< 200 HTTP/1.1 200 OK
+{
+  "thermostatCount": 1,
+  "revisionList": [
+    "276075659054:Second Floor:true:130228231056:080102000000:130228231003"
+  ],
+  "status": {
+    "code": 0,
+    "message": ""
+  }
+}
+

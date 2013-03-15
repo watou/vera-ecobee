@@ -1,0 +1,69 @@
+Query:
+
+{"selection":{"includeWeather":true,"includeAlerts":true,"includeRuntime":true,"includeProgram":true,"selectionMatch":"276075659054","includeSettings":true,"includeEvents":true,"selectionType":"thermostats"}}
+
+Returns:
+
+{
+  "identifier":"276075659054",
+  "thermostatRev":"130217030000",
+  "lastModified":"2013-02-17 03:00:00",
+  "program":{
+    "currentClimateRef":"home"
+  },
+  "thermostatTime":"2013-02-20 18:30:48",
+  "utcTime":"2013-02-20 23:30:48",
+  "events":[],
+  "alerts":[],
+  "modelNumber":"siSmart",
+  "name":"Second Floor",
+  "runtime":{
+    "actualTemperature":737,
+    "actualHumidity":30,
+
+    "desiredHumidity":-5002,
+    "desiredDehumidity":-5002,
+    "desiredHeat":700,
+    "desiredCool":780,
+
+    "connected":true,
+    "lastModified":"2013-02-20 23:23:44",
+    "lastStatusModified":"2013-02-20 23:23:44",
+    "firstConnected":"2013-02-13 20:56:19",
+    "connectDateTime":"2013-02-20 23:23:44",
+    "disconnectDateTime":"2013-02-14 00:00:00"
+  },
+  "settings":{
+    "hvacMode":"heat",
+
+    "heatRangeLow":450,
+    "heatRangeHigh":790,
+    "coolRangeLow":650,
+    "coolRangeHigh":920,
+
+    "humidity":"20",
+    "hasHumidifier":false,
+    "hasDehumidifier":false,
+    "dehumidifierMode":"off",
+    "humidifierMode":"off",
+    "dehumidifyWithAC":true,
+    "dehumidifierLevel":60,
+
+    "holdAction":"useEndTime",
+    "quickSaveSetForward":40,
+
+    "heatMaxTemp":790,
+    "heatMinTemp":450,
+    "coolMaxTemp":920,
+    "coolMinTemp":450,
+
+    "statusIntervalSeconds":900,
+
+    "coolStages":1,
+    "heatStages":1,
+
+    "quickSaveSetBack":40,
+    "eiLocation":"",
+  },
+}
+
