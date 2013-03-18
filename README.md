@@ -1,7 +1,7 @@
 <!--	Vera Plugin for ecobee Thermostats	-->
 
 
-![Devices in Vera](http://cocu.la/vera/ecobee/images/shot2.jpg)
+![Devices in Vera](http://cocu.la/vera/ecobee/images/shot3.jpg)
 
 **Currently in development**
 
