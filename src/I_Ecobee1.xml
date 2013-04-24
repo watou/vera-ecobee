@@ -45,7 +45,7 @@ decompress_lzo_file() {
 ]]
 
 		os.execute(decompressScript .. "decompress_lzo_file L_ecobee_dkjson.lua")
-		os.execute(decompressScript .. "decompress_lzo_file L_ecobee.lua")
+		-- os.execute(decompressScript .. "decompress_lzo_file L_ecobee.lua")
 
     local MSG_CLASS = "ecobee"
     local DEBUG_MODE = true

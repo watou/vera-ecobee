@@ -1,4 +1,4 @@
-module(...,package.seeall)
+module("L_ecobee",package.seeall)
 
 --[[
 
