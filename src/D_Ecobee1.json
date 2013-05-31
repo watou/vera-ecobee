@@ -38,15 +38,27 @@
                 {
                     "id": "1",
                     "scenegroup": "1"
+                },
+                {
+                    "id": "2",
+                    "isSingle": "1",
+                    "scenegroup": "2"
                 }
             ],
             "SceneGroup": [
                 {
                     "id": "1",
-                    "top": "1.5",
-                    "left": "0.25",
-                    "x": "1.5",
+                    "top": "1",
+                    "left": "0",
+                    "x": "2",
                     "y": "2"
+                },
+                {
+                    "id": "2",
+                    "top": "2",
+                    "left": "0.5",
+                    "x": "2",
+                    "y": "1"
                 }
             ],
             "Control": [
@@ -58,26 +70,49 @@
                     "Display": {
                         "Service": "urn:ecobee-com:serviceId:Ecobee1",
                         "Variable": "DisplayLabel",
-                        "Top": 60,
+                        "Top": 20,
                         "Left": 50,
-                        "Width": 175,
+                        "Width": 120,
                         "Height": 20
                     }
                 },
                 {
                     "ControlGroup": "1",
                     "ControlType": "variable",
-                    "top": "1",
-                    "left": "0",
+                    "top": "0",
+                    "left": "1",
                     "Display": {
                         "Service": "urn:ecobee-com:serviceId:Ecobee1",
                         "Variable": "DisplayValue",
-                        "Top": 120,
-                        "Left": 50,
-                        "Width": 175,
+                        "Top": 20,
+                        "Left": 175,
+                        "Width": 75,
                         "Height": 20
                     }
-                }
+                },
+                {
+                    "ControlGroup": "2",
+                    "ControlType": "button",
+                    "top": "0",
+                    "left": "0",
+                    "Label": {
+                        "lang_tag": "cmd_get_pin",
+                        "text": "Get PIN"
+                    },
+                    "Display": {
+                        "Top": 60,
+                        "Left": 50,
+                        "Width": 75,
+                        "Height": 20
+                    },
+                    "Command": {
+                        "Service": "urn:ecobee-com:serviceId:Ecobee1",
+                        "Action": "GetPin",
+                        "Parameters": []
+                    },
+                    "ControlCode": "get_pin"
+                },
+
             ]
         },
         {

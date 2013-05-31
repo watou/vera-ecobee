@@ -105,7 +105,7 @@ decompress_lzo_file() {
     end
 
     -- constants
-    local PLUGIN_VERSION = "0.5"
+    local PLUGIN_VERSION = "0.7"
     local ECOBEE_SID = "urn:ecobee-com:serviceId:Ecobee1"
     local HOUSE_STATUS_SID = "urn:upnp-org:serviceId:HouseStatus1"
     local TEMP_SENSOR_SID = "urn:upnp-org:serviceId:TemperatureSensor1"
@@ -495,16 +495,10 @@ decompress_lzo_file() {
         end
       end
 
-      -- if no other instances had an auth_token for us to copy, get one ourselves
+      -- if no other instances had an auth_token for us to copy, ask user to request PIN
 
       if not session.auth_token then
-        debug("Attempting to getPin...")
-        local ecobeePin = getPin(session)
-        if ecobeePin then
-          task("Register at ecobee.com now: " .. ecobeePin)
-          writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "DisplayLabel", "My Apps PIN:")
-          writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "DisplayValue", ecobeePin)
-        end
+        task("Not yet authorized. Press 'Get PIN' once; wait for PIN; enter at ecobee.com.")
 
       else
         if not session.refresh_token then
@@ -895,6 +889,20 @@ decompress_lzo_file() {
   <actionList>
     <action>
       <serviceId>urn:ecobee-com:serviceId:Ecobee1</serviceId>
+      <name>GetPin</name>
+      <job>
+        local session = loadSession()
+        debug("Attempting to getPin...")
+        local ecobeePin = getPin(session)
+        if ecobeePin then
+          task("Register at ecobee.com now: " .. ecobeePin)
+          writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "DisplayLabel", "My Apps PIN:")
+          writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "DisplayValue", ecobeePin)
+        end
+      </job>
+    </action>
+    <action>
+      <serviceId>urn:ecobee-com:serviceId:Ecobee1</serviceId>
       <name>SetStatus</name>
       <run>
         luup.variable_set(ECOBEE_SID, "status", lul_settings.status or "0", lul_device)
@@ -910,7 +918,7 @@ decompress_lzo_file() {
     <action>
       <serviceId>urn:upnp-org:serviceId:HouseStatus1</serviceId>
       <name>SetOccupancyState</name>
-      <run>
+      <job>
         local away
         if (lul_settings.NewOccupancyState == "Occupied") then
           away = false
@@ -924,7 +932,7 @@ decompress_lzo_file() {
         if not setAway(loadSession(), lul_device, away) then
           task("Failed to send away command.")
         end
-      </run>
+      </job>
     </action>
     <action>
       <serviceId>urn:upnp-org:serviceId:HouseStatus1</serviceId>
@@ -943,7 +951,7 @@ decompress_lzo_file() {
     <action>
       <serviceId>urn:upnp-org:serviceId:SwitchPower1</serviceId>
       <name>SetTarget</name>
-      <run>
+      <job>
         local away
         if (lul_settings.newTargetValue == "1") then
           away = false
@@ -957,7 +965,7 @@ decompress_lzo_file() {
         if not setAway(loadSession(), lul_device, away) then
           task("Failed to send away command.")
         end
-      </run>
+      </job>
     </action>
     <action>
       <serviceId>urn:upnp-org:serviceId:SwitchPower1</serviceId>
@@ -997,14 +1005,14 @@ decompress_lzo_file() {
     <action>
       <serviceId>urn:upnp-org:serviceId:TemperatureSetpoint1_Heat</serviceId>
       <name>SetCurrentSetpoint</name>
-      <run>
+      <job>
         local heatHoldTemp = upnpToEcobee(TEMP_SETPOINT_HEAT_SID, "SetCurrentSetpoint", "NewCurrentSetpoint", lul_settings)
         local session = loadSession()
         local func = ecobee.setHoldFunction(nil, heatHoldTemp, "indefinite")
         if not setHold(session, nil, lul_device, func) then
           task("Failed to set heat temperature setpoint.")
         end
-      </run>
+      </job>
     </action>
     <action>
       <serviceId>urn:upnp-org:serviceId:TemperatureSetpoint1_Heat</serviceId>
@@ -1023,14 +1031,14 @@ decompress_lzo_file() {
     <action>
       <serviceId>urn:upnp-org:serviceId:TemperatureSetpoint1_Cool</serviceId>
       <name>SetCurrentSetpoint</name>
-      <run>
+      <job>
         local coolHoldTemp = upnpToEcobee(TEMP_SETPOINT_COOL_SID, "SetCurrentSetpoint", "NewCurrentSetpoint", lul_settings)
         local session = loadSession()
         local func = ecobee.setHoldFunction(coolHoldTemp, nil, "indefinite")
         if not setHold(session, nil, lul_device, func) then
           task("Failed to set cool temperature setpoint.")
         end
-      </run>
+      </job>
     </action>
     <action>
       <serviceId>urn:upnp-org:serviceId:TemperatureSetpoint1_Cool</serviceId>
@@ -1042,7 +1050,7 @@ decompress_lzo_file() {
     <action>
       <serviceId>urn:upnp-org:serviceId:HVAC_UserOperatingMode1</serviceId>
       <name>SetModeTarget</name>
-      <run>
+      <job>
         -- tell the ecobee to switch to lul_settings.NewModeTarget
         local hvacMode = upnpToEcobee(HVAC_USER_SID, "SetModeTarget", "NewModeTarget", lul_settings)
         local session = loadSession()
@@ -1053,7 +1061,7 @@ decompress_lzo_file() {
         else
           task("Failed to set new hvacMode to " .. tostring(hvacMode))
         end
-      </run>
+      </job>
     </action>
     <action>
       <serviceId>urn:upnp-org:serviceId:HVAC_UserOperatingMode1</serviceId>
@@ -1072,14 +1080,14 @@ decompress_lzo_file() {
     <action>
       <serviceId>urn:upnp-org:serviceId:HVAC_FanOperatingMode1</serviceId>
       <name>SetMode</name>
-      <run>
+      <job>
         local session = loadSession()
         local func = ecobee.setHoldFunction(nil, nil, "indefinite")
         func.params.fan = upnpToEcobee(HVAC_FAN_SID, "SetMode", "NewMode", lul_settings)
         if not setHold(session, nil, lul_device, func) then
           task("Failed to set fan mode to " .. tostring(mode))
         end
-      </run>
+      </job>
     </action>
     <action>
       <serviceId>urn:upnp-org:serviceId:HVAC_FanOperatingMode1</serviceId>
@@ -1098,20 +1106,20 @@ decompress_lzo_file() {
     <action>
       <serviceId>urn:ecobee-com:serviceId:Ecobee1</serviceId>
       <name>ResumeProgram</name>
-      <run>
+      <job>
         local session = loadSession()
         return resumeProgram(session, getSelection(session, lul_device))
-      </run>
+      </job>
     </action>
     <action>
       <serviceId>urn:ecobee-com:serviceId:Ecobee1</serviceId>
       <name>SendMessage</name>
-      <run>
+      <job>
         local session = loadSession()
         local selection = getSelection(session, lul_device)
         local functions = { ecobee.sendMessageFunction(lul_settings.MessageText) }
         return updateThermostats(session, ecobee.thermostatsUpdateOptions(selection, functions))
-      </run>
+      </job>
     </action>
   </actionList>
 </implementation>

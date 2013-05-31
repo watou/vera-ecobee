@@ -1,7 +1,7 @@
 <!--	Vera Plugin for ecobee Thermostats	-->
 
 
-![Devices in Vera](http://cocu.la/vera/ecobee/images/shot3.jpg)
+![Devices in Vera](http://cocu.la/vera/ecobee/images/shot4.jpg)
 
 **Currently in development**
 
@@ -28,13 +28,13 @@ First, login to your web portal at [ecobee][] and switch to the [settings tab][]
 
 Ecobee uses the [OAuth 2.0](http://oauth.net/) framework for authorizing client applications, such as this plugin.  The practical implication of this is that you do not specify your user name and password in the plugin's settings; instead you grant access by entering a four-character PIN in the ecobee web portal when presented with one by the plugin.  _Please note that one ecobee account can only authorize a single plugin at one time. If you authorize the plugin from a different Vera, it will invalidate any previous authorization of the plugin for that ecobee account._
 
-Upon installing the ecobee plugin, it will attempt to connect with the ecobee.com servers and obtain a four-character PIN in order to authorize the plugin to access your ecobee.com account.  This PIN will be displayed on the Vera dashboard on the ecobee device that was created at installation.
+Upon installing the ecobee plugin, press the `Get PIN` button on the ecobee device.  The plugin will attempt to connect with the ecobee.com servers and obtain a four-character PIN in order to authorize the plugin to access your ecobee.com account.  This PIN will be displayed on the Vera dashboard on the ecobee device that was created at installation.
 
-![ecobee device prompting to register PIN at ecobee.com](http://cocu.la/vera/ecobee/images/shot2b.jpg)
+![ecobee device prompting to register PIN at ecobee.com](http://cocu.la/vera/ecobee/images/shot4b.jpg)
 
-Once you see it, you then have ten minutes or less to enter this PIN in the My Apps widget in your ecobee.com web portal.  If the PIN expires, the plugin will request and present a new PIN.
+Once you see it, you then have ten minutes or less to enter this PIN in the My Apps widget in your ecobee.com web portal.  If the PIN expires, you will have to press the `Get PIN` button again to request a new PIN.
 
-Also, you may want to mark your calendar for next year because this authorization expires after one year.  External events may also invalidate the authorization sooner, which will trigger the PIN request process again.
+Also, you may want to mark your calendar for next year because this authorization expires after one year.  External events may also invalidate the authorization sooner, which will present you with a "task" message at the top of the Vera UI for you to request a new PIN.
 
 ### Choosing which thermostats to monitor and control ###
 
@@ -236,7 +236,6 @@ Thanks to [ecobee][] and their enthusiastic customers, and the helpful contribut
 
 ## History ##
 
-### 2013-0X-XX    v0.5
+### 2013-05-31    v0.7
 
-* Initial plugin upload to <http://apps.mios.com>
-
+* Now require users to request a PIN from ecobee.com by pressing the `Get PIN` button on the ecobee device on the Vera dashboard.

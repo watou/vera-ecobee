@@ -179,7 +179,7 @@ Returns ecobeePin and sets these values on success:
 ]]--
 function getPin(session)
   local options = { url = "/home/authorize", headers = { Accept = "application/json" } }
-  local data = { response_type = "ecobeePin", scope = session.scope, client_id = "1CboqiVS4K9lyjeBcQC6tIOLAMoGPVsH" }
+  local data = { response_type = "ecobeePin", scope = session.scope, client_id = "M2Fo9WiCIrQUZoC5EbckbjmttWLUVcgU" }
   local res = makeRequest(session, options, stringify(data))
 
   if res and res.ecobeePin and res.code then
@@ -203,7 +203,7 @@ Sets and returns these values on success:
 function getTokens(session)
   local options = { url = "/home/token", method = "POST",
                     headers = { Accept = "application/json", ["Content-Type"] = "application/x-www-form-urlencoded" } }
-  local data = { grant_type = "ecobeePin", code = session.auth_token, client_id = "1CboqiVS4K9lyjeBcQC6tIOLAMoGPVsH" }
+  local data = { grant_type = "ecobeePin", code = session.auth_token, client_id = "M2Fo9WiCIrQUZoC5EbckbjmttWLUVcgU" }
   local res = makeRequest(session, options, stringify(data))
   
   if res and res.access_token and res.token_type and res.refresh_token and res.scope then
@@ -230,7 +230,7 @@ Sets and returns these values on success:
 local function refreshTokens(session)
   local options = { url = "/home/token", method = "POST",
                     headers = { Accept = "application/json", ["Content-Type"] = "application/x-www-form-urlencoded" } }
-  local data = { grant_type = "refresh_token", code = session.refresh_token, client_id = "1CboqiVS4K9lyjeBcQC6tIOLAMoGPVsH" }
+  local data = { grant_type = "refresh_token", code = session.refresh_token, client_id = "M2Fo9WiCIrQUZoC5EbckbjmttWLUVcgU" }
   local res = makeRequest(session, options, stringify(data))
   
   if res and res.access_token and res.token_type and res.refresh_token and res.scope then

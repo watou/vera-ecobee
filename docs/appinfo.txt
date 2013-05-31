@@ -1,0 +1,6 @@
+AppName: Vera Home Controllers
+
+AppSummary: Monitor and control your ecobee thermostats from Vera
+
+AppDescription: This app allows you to monitor and control your ecobee thermostats from the Vera home automation system.
+

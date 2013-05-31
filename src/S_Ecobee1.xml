@@ -8,6 +8,10 @@
   </serviceStateTable>
   <actionList>
     <action>
+      <name>GetPin</name>
+      <argumentList></argumentList>
+    </action>
+    <action>
       <name>ResumeProgram</name>
       <argumentList></argumentList>
     </action>
