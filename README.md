@@ -38,7 +38,7 @@ Also, you may want to mark your calendar for next year because this authorizatio
 
 ### Choosing which thermostats to monitor and control ###
 
-_If you are a **non-commercial customer**, the default values should work for you and you can skip this section.  Otherwise, perform this step now._
+_If you are a **non-commercial customer**, the default values should work for you and **you can skip this section**.  Otherwise, perform this step now._
 
 If you are an Energy Management System (EMS) commercial customer, you must also set values for three variables on the Advanced tab of the ecobee device.
 
