@@ -1,0 +1,1149 @@
+<?xml version="1.0"?>
+<!-- 
+ MiOS (Vera) Plugin for ecobee Thermostats
+
+ Copyright (C) 2013  John W. Cocula and others
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<implementation>
+  <functions>
+    -- [The following is from Hugh Eaves' I_RTCOA_Wifi_ZoneThermostat1.xml.
+    -- He figured out how to work around problems in deploying compressed
+    -- modules. Please cite him as copyright owner under the GPL license terms.]
+		-- Using "require" to access compressed modules doesn't work if the 
+		-- module is declared without using the "module" function.
+		-- (see http://bugs.micasaverde.com/view.php?id=2276 )
+		--
+		-- We work around this with a shell script that executes pluto-lzo
+		-- to decompress the module. The temp file is used to
+		-- avoid a race condition when multiple instances of this module
+		-- start at the same time. (to prevent one instance from loading a 
+		-- partially decompressed file from another instance)
+    local decompressScript = [[
+decompress_lzo_file() {
+	SRC_FILE=/etc/cmh-ludl/$1.lzo
+	DEST_FILE=/etc/cmh-ludl/$1
+	if [ ! -e $DEST_FILE -o $SRC_FILE -nt $DEST_FILE ]
+	then
+		TEMP_FILE=$(mktemp)
+		pluto-lzo d $SRC_FILE $TEMP_FILE
+		mv $TEMP_FILE $DEST_FILE
+	fi
+}
+]]
+
+    -- I cannot distribute a file called S_HouseStatus1.xml because it's already
+    -- claimed by the Nest plugin, but when I try to use S_HouseStatusEcobee1.xml
+    -- as the definition of urn:upnp-org:serviceId:HouseStatus1, the Vera reports
+    -- that it's an invalid service, unless a file named S_HouseStatus1.xml is
+    -- present anyway.  Since I developed with the Nest plugin installed the entire
+    -- time, I never saw this odd behavior.  So this script will copy over the
+    -- distributed S_HouseStatusEcobee1.xml.lzo to S_HouseStatus1.xml.lzo, unless
+    -- said file is already in place.  But the one distributed with the Nest plugin
+    -- has identical contents, so either way it shouldn't be a problem -- unless
+    -- installing the Nest plugin after the ecobee plugin complains of the file being
+    -- already present?  Oy, what a tangled web we weave...
+    local copyHouseStatusScript = [[
+copy_house_status_file() {
+  SRC_FILE=/etc/cmh-ludl/S_HouseStatusEcobee1.xml.lzo
+  DEST_FILE=/etc/cmh-ludl/S_HouseStatus1.xml.lzo
+  if [ ! -e $DEST_FILE ]
+  then
+    cp $SRC_FILE $DEST_FILE
+  fi
+}
+]]
+
+		os.execute(decompressScript .. "decompress_lzo_file L_ecobee_dkjson.lua")
+    os.execute(copyHouseStatusScript .. "copy_house_status_file")
+
+    local MSG_CLASS = "ecobee"
+    local DEBUG_MODE = true
+    local taskHandle = -1
+    local TASK_ERROR = 2
+    local TASK_ERROR_PERM = -2
+    local TASK_SUCCESS = 4
+    local TASK_BUSY = 1
+
+    -- utility functions
+
+    local function log(text, level)
+      luup.log(MSG_CLASS .. ": " .. text, (level or 1))
+    end
+
+    local function debug(text)
+      if (DEBUG_MODE) then
+        log("debug: " .. text, 35)
+      end
+    end
+
+    local function task(text, mode)
+      local mode = mode or TASK_ERROR
+      if (mode ~= TASK_SUCCESS) then
+        log("task: " .. text, 50)
+      end
+      taskHandle = luup.task(text, (mode == TASK_ERROR_PERM) and TASK_ERROR or mode, MSG_CLASS, taskHandle)
+    end
+
+    local function readVariableOrInit(lul_device, serviceId, name, defaultValue) 
+      local var = luup.variable_get(serviceId, name, lul_device)
+      if (var == nil) then
+        var = defaultValue
+        luup.variable_set(serviceId, name, var, lul_device)
+      end
+      return var
+    end
+
+    local function writeVariable(lul_device, serviceId, name, value) 
+      luup.variable_set(serviceId, name, value, lul_device)
+    end
+
+    local function writeVariableIfChanged(lul_device, serviceId, name, value)
+      local curValue = luup.variable_get(serviceId, name, lul_device)
+      if value ~= curValue then
+        writeVariable(lul_device, serviceId, name, value)
+      end
+      return value ~= curValue
+    end
+
+    local function findChild(deviceId, label)
+      for k, v in pairs(luup.devices) do
+        if (v.device_num_parent == deviceId and v.id == label) then
+          return k
+        end
+      end
+    end
+
+    -- constants
+    local PLUGIN_VERSION = "0.8"
+    local ECOBEE_SID = "urn:ecobee-com:serviceId:Ecobee1"
+    local HOUSE_STATUS_SID = "urn:upnp-org:serviceId:HouseStatus1"
+    local TEMP_SENSOR_SID = "urn:upnp-org:serviceId:TemperatureSensor1"
+    local TEMP_SETPOINT_HEAT_SID = "urn:upnp-org:serviceId:TemperatureSetpoint1_Heat"
+    local TEMP_SETPOINT_COOL_SID = "urn:upnp-org:serviceId:TemperatureSetpoint1_Cool"
+    local HUMIDITY_SENSOR_SID = "urn:micasaverde-com:serviceId:HumiditySensor1"
+    local HVAC_FAN_SID = "urn:upnp-org:serviceId:HVAC_FanOperatingMode1"
+    local HVAC_USER_SID = "urn:upnp-org:serviceId:HVAC_UserOperatingMode1"
+    local HA_DEVICE_SID = "urn:micasaverde-com:serviceId:HaDevice1"
+    local SWITCH_POWER_SID = "urn:upnp-org:serviceId:SwitchPower1"
+    local MCV_ENERGY_METERING_SID = "urn:micasaverde-com:serviceId:EnergyMetering1"
+    local DEFAULT_POLL = 60
+    local MIN_POLL = 60
+    local SOON = "5" -- seconds
+
+    local PARENT_DEVICE
+
+    local dkjson = require("L_ecobee_dkjson")
+    local json = L_ecobee_dkjson
+    local ecobee = require("L_ecobee")
+
+    local veraTemperatureScale = "F"
+
+    local function getVeraTemperatureScale()
+      local code, data = luup.inet.wget("http://localhost:3480/data_request?id=lu_sdata")
+      
+      if (code == 0) then
+        data = json.decode(data)
+      end
+
+      veraTemperatureScale = ((code == 0) and (data ~= nil) and (data.temperature ~= nil)) and data.temperature or "F"
+    end
+
+    -- child device altids
+    local THERM_ID_PREFIX = "therm."
+    local HUMID_ID_PREFIX = "humid."
+    local HOUSE_ID_PREFIX = "house."
+    local function getDeviceId(lul_device, prefix)
+      prefix = prefix or "%."
+      local altid = luup.devices[lul_device].id
+      local i, j = string.find(altid, prefix)
+      if not i then
+        log("getDeviceId was passed invalid altid '" .. altid .. "' from device " .. lul_device)
+        return "ERROR"
+      end
+      return string.sub(altid, j+1)
+    end
+    local function getThermId(lul_device) return getDeviceId(lul_device, THERM_ID_PREFIX) end
+    local function getHumidId(lul_device) return getDeviceId(lul_device, HUMID_ID_PREFIX) end
+    local function getHouseId(lul_device) return getDeviceId(lul_device, HOUSE_ID_PREFIX) end
+
+    -- find the sibling device that is really the kind of device we are looking for
+    -- defaults to finding the thermostat sibling if prefix not specified
+    local function findSibling(lul_device, prefix)
+      prefix = prefix or THERM_ID_PREFIX
+      local id = getDeviceId(lul_device)
+      local therm_id = prefix .. id
+      for k,v in pairs(luup.devices) do
+        if luup.devices[lul_device].device_num_parent == v.device_num_parent and v.id == therm_id then
+          return k
+        end
+      end
+    end
+
+    local function round(value, precision)
+      return (value >= 0) and
+        (math.floor(value * precision + 0.5) / precision) or 
+        (math.ceil(value * precision - 0.5) / precision)
+    end
+
+    -- convert thermostat format (F*10) to local format (C or F)
+    local function localizeTemp(temperature)
+      return (veraTemperatureScale == "F") and round(temperature/10, 1) or
+             round(((temperature/10 + 0.0) - 32.0) / 1.8, 1)
+    end
+
+    -- convert local format (C or F) to thermostat format (F*10)
+    local function delocalizeTemp(temperature)
+      return (veraTemperatureScale == "F") and temperature*10 or
+             round((((temperature + 0.0) * 1.8) + 32)*10, 1)
+    end
+
+    -- convert "2013-02-20 23:23:44" to number of seconds since 1/1/1970
+    local function toSeconds(dateString, useLocal)
+      useLocal = useLocal or false
+      local year, month, day, hour, min, sec = string.match(dateString, "(%d+)%-(%d+)%-(%d+) (%d+):(%d+):(%d+)")
+      local offset = useLocal and 0 or (os.time() - os.time(os.date("!*t")))
+      return os.time{year=year, month=month, day=day, hour=hour, min=min, sec=sec} + offset
+    end
+
+    -- "away" is defined as either an active event that has the same relative temps set as the quickSave
+    -- setBack/setForward, or an active switchOccupancy event that is named "unoccupied"
+    local function isAway(t)
+      return t.events and t.settings and #t.events > 0 and
+             ((t.events[1].coolRelativeTemp == t.settings.quickSaveSetForward and
+               t.events[1].heatRelativeTemp == t.settings.quickSaveSetBack) or
+              (t.events[1]["type"] == "switchOccupancy" and t.events[1].name == "unoccupied")) -- maybe wrong TODO
+             -- and t.events[1].running when usable TODO
+    end
+
+    -- convert ecobee values to UPnP values
+    local ECOBEE_TO_UPNP = {
+      [ECOBEE_SID] = {
+        ["thermostatRev"] = function(r) return r.thermostatRev end,
+        ["runtimeRev"] = function(r) return r.runtimeRev end,
+        ["quickSaveSetBack"] = function(t) return tostring(t.settings.quickSaveSetBack) end,
+        ["quickSaveSetForward"] = function(t) return tostring(t.settings.quickSaveSetForward) end,
+        ["currentEventType"] = function(t)
+          return (t.events and #t.events > 0 and t.events[1]["type"]) and t.events[1]["type"] or ""
+        end,
+        ["currentClimateRef"] = function(t)
+          return (t.program and t.program.currentClimateRef) and t.program.currentClimateRef or ""
+        end,
+        ["StreetAddress"] = function(t) return t.location.streetAddress end,
+        ["City"] = function(t) return t.location.city end,
+        ["ProvinceState"] = function(t) return t.location.provinceState end,
+        ["Country"] = function(t) return t.location.country end,
+        ["PostalCode"] = function(t) return t.location.postalCode end,
+        ["PhoneNumber"] = function(t) return t.location.phoneNumber end,
+        ["MapCoordinates"] = function(t) return t.location.mapCoordinates end
+      },
+      [HOUSE_STATUS_SID] = {
+        ["OccupancyState"] = function(t) return isAway(t) and "Unoccupied" or "Occupied" end
+      },
+      [SWITCH_POWER_SID] = {
+        ["Status"] = function(t) return isAway(t) and "0" or "1" end
+      },
+      [TEMP_SENSOR_SID] = {
+        ["Application"] = function() return "Room" end,
+        ["CurrentTemperature"] = function(t) return tostring(localizeTemp(t.runtime.actualTemperature)) end
+      },
+      [TEMP_SETPOINT_HEAT_SID] = {
+        ["Application"] = function() return "Heating" end,
+        ["CurrentSetpoint"] = function(t) return tostring(localizeTemp(t.runtime.desiredHeat)) end
+      },
+      [TEMP_SETPOINT_COOL_SID] = {
+        ["Application"] = function() return "Cooling" end,
+        ["CurrentSetpoint"] = function(t) return tostring(localizeTemp(t.runtime.desiredCool)) end
+      },
+      [HUMIDITY_SENSOR_SID] = {
+        ["CurrentLevel"] = function(t) return tostring(t.runtime.actualHumidity) end
+      },
+      [HVAC_FAN_SID] = {
+        ["Mode"] = function(t)
+          local fan = (t.events and #t.events > 0) and t.events[1].fan or nil
+          -- TODO: add in "and t.events[1].running" above once it can be relied on
+          
+          -- if there is no current event, inspect the current climate
+          if not fan and t.settings and t.program and t.program.climates then
+            for i,v in ipairs(t.program.climates) do
+              if v.climateRef == t.program.currentClimateRef then
+                fan = t.settings.hvacMode == "cool" and v.coolFan or v.heatFan
+                break
+              end
+            end
+          end
+
+          if fan == "auto" then return "Auto"
+          elseif fan == "on" then return "ContinuousOn"
+          else
+            log("Unknown fan '" .. tostring(fan) .. "'.")
+            return "Unknown"
+          end
+        end,
+        ["FanStatus"] = function(t)
+          return "Off" -- TODO, not currently supported by ecobee API
+        end
+      },
+      [HVAC_USER_SID] = {
+        ["ModeStatus"] = function(t)
+          if     (t.settings.hvacMode == "heat")  then return "HeatOn"
+          elseif (t.settings.hvacMode == "cool")  then return "CoolOn"
+          elseif (t.settings.hvacMode == "auto")  then return "AutoChangeOver"
+          elseif (t.settings.hvacMode == "off")   then return "Off"
+          else return "InDeadBand"
+          end
+        end
+      },
+      [HA_DEVICE_SID] = {
+       ["LastUpdate"] = function(t) return tostring(toSeconds(t.runtime.lastModified)) end,
+       ["CommFailure"] = function(r) return r.connected and "0" or "1" end,
+       ["Commands"] = function(t)
+         local commands = { "hvac_off", "hvac_auto", "hvac_cool",  "hvac_heat",
+                            "fan_auto", "fan_on",    "resume_program" }
+         if t.runtime.desiredHeat ~= ecobee.HEAT_OFF then
+           commands[#commands + 1] = "heating_setpoint"
+         end
+         if t.runtime.desiredCool ~= ecobee.COOL_OFF then
+           commands[#commands + 1] = "cooling_setpoint"
+         end
+         return table.concat(commands, ",")
+       end
+      },
+      [MCV_ENERGY_METERING_SID] = {
+        ["UserSuppliedWattage"] = function(t) return "0,0,0" end
+      }
+    }
+
+    local function ecobeeToUpnp(serviceId, variableName, ...)
+      return ECOBEE_TO_UPNP[serviceId][variableName](...)
+    end
+
+    local function ecobeeToUpnpParam(serviceId, variableName, ...)
+      return serviceId .. "," .. variableName .. "=" .. ecobeeToUpnp(serviceId, variableName, ...)
+    end
+
+    local function writeVariableFromEcobee(lul_device, serviceId, name, ...)
+      writeVariable(lul_device, serviceId, name, ecobeeToUpnp(serviceId, name, ...))
+    end
+
+    local function writeVariableFromEcobeeIfChanged(lul_device, serviceId, name, ...)
+      return writeVariableIfChanged(lul_device, serviceId, name, ecobeeToUpnp(serviceId, name, ...))
+    end
+
+    -- convert UPnP values to ecobee values
+    local UPNP_TO_ECOBEE = {
+      [TEMP_SETPOINT_HEAT_SID] = {
+        ["SetCurrentSetpoint"] = {
+          ["NewCurrentSetpoint"] = function(lul_settings)
+            return delocalizeTemp(lul_settings.NewCurrentSetpoint)
+          end
+        }
+      },
+      [TEMP_SETPOINT_COOL_SID] = {
+        ["SetCurrentSetpoint"] = {
+          ["NewCurrentSetpoint"] = function(lul_settings)
+            return delocalizeTemp(lul_settings.NewCurrentSetpoint)
+          end
+        }
+      },
+      [HVAC_FAN_SID] = {
+        ["SetMode"] = {
+          ["NewMode"] = function(lul_settings)
+            if (lul_settings.NewMode == "ContinuousOn") then return "on"
+            elseif (lul_settings.NewMode == "Auto") then return "auto"
+            end
+          end
+        }
+      },
+      [HVAC_USER_SID] = {
+        ["SetModeTarget"] = {
+          ["NewModeTarget"] = function(lul_settings)
+            if     (lul_settings.NewModeTarget == "HeatOn")         then return "heat"
+            elseif (lul_settings.NewModeTarget == "CoolOn")         then return "cool"
+            elseif (lul_settings.NewModeTarget == "AutoChangeOver") then return "auto"
+            elseif (lul_settings.NewModeTarget == "Off")            then return "off"
+            elseif (lul_settings.NewModeTarget == "AuxHeatOn")      then return "auxHeatOnly"
+            end
+          end
+        }
+      }
+    }
+
+    local function upnpToEcobee(serviceId, actionName, variableName, lul_settings)
+      return UPNP_TO_ECOBEE[serviceId][actionName][variableName](lul_settings)
+    end
+
+    local ecobeeLog
+
+    local function loadSession()
+      local session = {}
+
+      -- Config variables
+      session.poll   = tonumber(readVariableOrInit(PARENT_DEVICE, ECOBEE_SID, "poll", tostring(DEFAULT_POLL)))
+      session.poll   = session.poll or DEFAULT_POLL
+      session.poll   = (session.poll &lt; MIN_POLL) and MIN_POLL or session.poll 
+
+      session.selectionType  = readVariableOrInit(PARENT_DEVICE, ECOBEE_SID, "selectionType",  "registered")
+      session.selectionMatch = readVariableOrInit(PARENT_DEVICE, ECOBEE_SID, "selectionMatch", "")
+      session.scope          = readVariableOrInit(PARENT_DEVICE, ECOBEE_SID, "scope",          "smartWrite")
+
+      -- Session variables
+      session.auth_token    = luup.variable_get(ECOBEE_SID, "auth_token",    PARENT_DEVICE)
+      if session.auth_token == "" then session.auth_token = nil end
+
+      session.access_token  = luup.variable_get(ECOBEE_SID, "access_token",  PARENT_DEVICE)
+      if session.access_token == "" then session.access_token = nil end
+
+      session.token_type    = luup.variable_get(ECOBEE_SID, "token_type",    PARENT_DEVICE)
+      if session.token_type == "" then session.token_type = nil end
+
+      session.refresh_token = luup.variable_get(ECOBEE_SID, "refresh_token", PARENT_DEVICE)
+      if session.refresh_token == "" then session.refresh_token = nil end
+
+      session.log = ecobeeLog
+
+      return session
+    end
+
+    local function saveSession(session)
+      if session.error then
+        log("Error: " .. tostring(session.error) .. ": " .. tostring(session.error_description))
+        if ecobee.isAuthError(session.error) and session.error ~= "authorization_pending" then
+          log("Encountered authorization error; forgetting tokens.")
+          session.auth_token = nil
+          session.access_token = nil
+          session.token_type = nil
+          session.refresh_token = nil
+        end
+      end
+
+      writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "auth_token",    session.auth_token or "")
+      writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "access_token",  session.access_token or "")
+      writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "token_type",    session.token_type or "")
+      writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "refresh_token", session.refresh_token or "")
+
+      local status = (session.access_token and session.access_token ~= "" and not session.error)
+      writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "status", status and "1" or "0")
+    end
+
+    -- wrapper ecobee API calls so saveSession is called after each API call
+    local function getPin(session)
+      local pin = ecobee.getPin(session)
+      saveSession(session)
+      return pin
+    end
+    
+    local function getTokens(session)
+      local access_token, token_type, refresh_token, scope = ecobee.getTokens(session)
+      saveSession(session)
+      return access_token, token_type, refresh_token, scope
+    end
+
+    local function getThermostatSummary(session, thermostatSummaryOptions)
+      local revisions = ecobee.getThermostatSummary(session, thermostatSummaryOptions)
+      saveSession(session)
+      return revisions
+    end
+
+    local function getThermostats(session, thermostatsOptions)
+      local thermostats = ecobee.getThermostats(session, thermostatsOptions)
+      saveSession(session)
+      return thermostats
+    end
+
+    local function updateThermostats(session, thermostatsUpdateOptions)
+      local success = ecobee.updateThermostats(session, thermostatsUpdateOptions)
+      saveSession(session)
+      return success
+    end
+
+    local function getSelection(session, lul_device)
+      return lul_device == PARENT_DEVICE and { selectionType = session.selectionType, selectionMatch = session.selectionMatch }
+                                          or { selectionType = "thermostats", selectionMatch = getDeviceId(lul_device) }
+    end
+
+
+    local statusOutstanding = false
+    local function getStatusSoon()
+      if not statusOutstanding then
+        statusOutstanding = true
+        debug("Scheduling status poll in " .. SOON .. " seconds.")
+        luup.call_timer("getStatus", 1, SOON, "", "")
+      end
+    end
+    
+    -- get status from ecobee
+    
+    function getStatus()
+      -- debug("in getStatus()")
+
+      statusOutstanding = false
+
+      local session = loadSession()
+
+      -- attempt to copy another instance's auth_token if we don't have one yet
+      -- as long as it uses the same scope we do
+
+      if not session.auth_token then
+        local device_type = luup.devices[PARENT_DEVICE].device_type
+        for k,v in pairs(luup.devices) do
+          if k ~= PARENT_DEVICE and device_type == v.device_type then
+            local auth_token = luup.variable_get(ECOBEE_SID, "auth_token", k)
+            local scope = luup.variable_get(ECOBEE_SID, "scope", k)
+            if auth_token and auth_token ~= "" and scope == session.scope then
+              session.auth_token = auth_token
+              session.access_token = nil
+              session.token_type = nil
+              session.refresh_token = nil
+              saveSession(session)
+
+              writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "DisplayLabel", "")
+              writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "DisplayValue", "")
+              debug("Copied auth_token " .. auth_token .. " from sibling " .. tostring(k))
+              break
+            end
+          end
+        end
+      end
+
+      -- if no other instances had an auth_token for us to copy, ask user to request PIN
+
+      if not session.auth_token then
+        task("Not yet authorized. Press 'Get PIN' once; wait for PIN; enter at ecobee.com.")
+
+      else
+        if not session.refresh_token then
+          debug("About to getTokens...")
+          getTokens(session)
+          if session.refresh_token then
+
+            -- having successfully registered the PIN, this auth_token is now valid, so
+            -- distribute this auth_token to all instances of this device type (as long
+            -- as they use the same scope we do) since one user can only have one instance
+            -- of this app authorized at one time
+
+            local device_type = luup.devices[PARENT_DEVICE].device_type
+            for k,v in pairs(luup.devices) do
+              if k ~= PARENT_DEVICE and device_type == v.device_type then
+                local scope = luup.variable_get(ECOBEE_SID, "scope", k)
+                if scope == session.scope then
+                  writeVariableIfChanged(k, ECOBEE_SID, "auth_token", session.auth_token)
+                  writeVariableIfChanged(k, ECOBEE_SID, "access_token", "")
+                  writeVariableIfChanged(k, ECOBEE_SID, "token_type", "")
+                  writeVariableIfChanged(k, ECOBEE_SID, "refresh_token", "")
+                  debug("Copied auth_token " .. session.auth_token .. " to sibling " .. tostring(k))
+                end
+              end
+            end
+          end
+        end
+
+        if not session.refresh_token then
+          log("Skipping this status update due to previous errors.")
+          return
+        end
+
+        debug("Fetching revisions...")
+        local revisions = getThermostatSummary(session, ecobee.selectionObject(session.selectionType, session.selectionMatch))
+        if not revisions then
+          log("Unable to getThermostatSummary; skipping status update.")
+          return
+        end
+
+        local count = 0
+        for k,v in pairs(revisions) do count = count + 1 end
+        writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "DisplayLabel", "Thermostats")
+        writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "DisplayValue", tostring(count))
+
+        -- first, see if Vera doesn't know the same thermostats, humidistats and houses as ecobee.com knows thermostats
+        local newDevices = 0
+        for id,revision in pairs(revisions) do
+          if not findChild(PARENT_DEVICE, THERM_ID_PREFIX .. id) then
+            newDevices = newDevices + 1
+          end
+          if not findChild(PARENT_DEVICE, HUMID_ID_PREFIX .. id) then
+            newDevices = newDevices + 1
+          end
+          if not findChild(PARENT_DEVICE, HOUSE_ID_PREFIX .. id) then
+            newDevices = newDevices + 1
+          end
+        end
+
+        -- also check to see if Vera knows thermostats that are no longer reported by ecobee.com
+        local oldDevices = 0
+        for device_num, v in pairs(luup.devices) do
+          if v.device_num_parent == PARENT_DEVICE then
+            if not revisions[getDeviceId(device_num)] then
+              oldDevices = oldDevices + 1
+            end
+          end
+        end
+
+        -- if the sets of devices are out of sync...
+        if newDevices &gt; 0 or oldDevices &gt; 0 then
+          -- do a full thermostat fetch and create child devices
+          log("Synchronizing devices with ecobee.com...")
+
+          local includes = { settings=true, runtime=true, events=true, program=true, location=true }
+          local options = ecobee.selectionObject(session.selectionType, session.selectionMatch, includes)
+          local thermostats = getThermostats(session, options)
+          if thermostats then
+
+            local ptr = luup.chdev.start(PARENT_DEVICE)
+
+            for id,t in pairs(thermostats) do
+              local name = t.name == "" and id or t.name
+              local r = revisions[id]
+              local altid = THERM_ID_PREFIX .. id
+              luup.chdev.append(PARENT_DEVICE, ptr, altid, name, "urn:schemas-upnp-org:device:HVAC_ZoneThermostat:1",
+                                "D_EcobeeThermostat1.xml", "",
+                                ecobeeToUpnpParam(ECOBEE_SID, "thermostatRev", r) ..
+                        "\n" .. ecobeeToUpnpParam(ECOBEE_SID, "runtimeRev", r) ..
+                        "\n" .. ecobeeToUpnpParam(ECOBEE_SID, "quickSaveSetBack", t) .. 
+                        "\n" .. ecobeeToUpnpParam(ECOBEE_SID, "quickSaveSetForward", t) .. 
+                        "\n" .. ecobeeToUpnpParam(TEMP_SENSOR_SID, "CurrentTemperature", t) ..
+                        "\n" .. ecobeeToUpnpParam(TEMP_SETPOINT_HEAT_SID, "CurrentSetpoint", t) ..
+                        "\n" .. ecobeeToUpnpParam(TEMP_SETPOINT_COOL_SID, "CurrentSetpoint", t) ..
+                        "\n" .. ecobeeToUpnpParam(HVAC_FAN_SID, "Mode", t) ..
+                        "\n" .. ecobeeToUpnpParam(HVAC_FAN_SID, "FanStatus", t) ..
+                        "\n" .. ecobeeToUpnpParam(HVAC_USER_SID, "ModeStatus", t) ..
+                        "\n" .. ecobeeToUpnpParam(HA_DEVICE_SID, "LastUpdate", t) ..
+                        "\n" .. ecobeeToUpnpParam(HA_DEVICE_SID, "CommFailure", r) ..
+                        "\n" .. ecobeeToUpnpParam(HA_DEVICE_SID, "Commands", t) ..
+                        "\n" .. ecobeeToUpnpParam(MCV_ENERGY_METERING_SID, "UserSuppliedWattage", t)
+                                , false, false)
+
+              altid = HUMID_ID_PREFIX .. id
+              luup.chdev.append(PARENT_DEVICE, ptr, altid, name, "urn:schemas-ecobee-com:device:EcobeeHumidistat:1",
+                                "D_EcobeeHumidistat1.xml", "",
+                                ecobeeToUpnpParam(HUMIDITY_SENSOR_SID, "CurrentLevel", t) ..
+                        "\n" .. ecobeeToUpnpParam(HA_DEVICE_SID, "LastUpdate", t) ..
+                        "\n" .. ecobeeToUpnpParam(HA_DEVICE_SID, "CommFailure", r)
+                                , false, false)
+
+              altid = HOUSE_ID_PREFIX .. id
+              luup.chdev.append(PARENT_DEVICE, ptr, altid, name, "urn:schemas-ecobee-com:device:EcobeeHouse:1",
+                                "D_EcobeeHouse1.xml", "",
+                                ecobeeToUpnpParam(HOUSE_STATUS_SID, "OccupancyState", t) ..
+                        "\n" .. ecobeeToUpnpParam(SWITCH_POWER_SID, "Status", t) ..
+                        "\n" .. ecobeeToUpnpParam(ECOBEE_SID, "StreetAddress", t) ..
+                        "\n" .. ecobeeToUpnpParam(ECOBEE_SID, "City", t) ..
+                        "\n" .. ecobeeToUpnpParam(ECOBEE_SID, "ProvinceState", t) ..
+                        "\n" .. ecobeeToUpnpParam(ECOBEE_SID, "Country", t) ..
+                        "\n" .. ecobeeToUpnpParam(ECOBEE_SID, "PostalCode", t) ..
+                        "\n" .. ecobeeToUpnpParam(ECOBEE_SID, "PhoneNumber", t) ..
+                        "\n" .. ecobeeToUpnpParam(ECOBEE_SID, "MapCoordinates", t) ..
+                        "\n" .. ecobeeToUpnpParam(ECOBEE_SID, "currentEventType", t) ..
+                        "\n" .. ecobeeToUpnpParam(ECOBEE_SID, "currentClimateRef", t) ..
+                        "\n" .. ecobeeToUpnpParam(HA_DEVICE_SID, "LastUpdate", t) ..
+                        "\n" .. ecobeeToUpnpParam(HA_DEVICE_SID, "CommFailure", r)
+                                , false, false)
+            end
+
+            luup.chdev.sync(PARENT_DEVICE, ptr)
+            log("Updated children device(s); awaiting restart...")
+            return
+          end
+
+        else
+
+          -- see which thermostats have changed settings or runtime values, or connected state
+          local changed = {}
+          for id,revision in pairs(revisions) do
+            local child = findChild(PARENT_DEVICE, THERM_ID_PREFIX .. id)
+            if not child then
+              log("Failed to find device for thermostat " .. id)
+            else
+              if (revision.thermostatRev ~= luup.variable_get(ECOBEE_SID, "thermostatRev", child)) or
+                 (revision.runtimeRev ~= luup.variable_get(ECOBEE_SID, "runtimeRev", child)) or 
+                 (revision.connected ~= (luup.variable_get(HA_DEVICE_SID, "CommFailure", child) == "0")) then
+                changed[#changed + 1] = id
+              end
+            end
+          end
+
+          debug(tostring(#changed) .. " update(s) found from ecobee.com.")
+
+          if #changed > 0 then
+            -- just fetch the changed thermostats from ecobee.com
+            local includes = { settings=true, runtime=true, events=true, program=true }
+            local thermostats = getThermostats(session, ecobee.selectionObject("thermostats", changed, includes))
+            if thermostats then
+              for id,t in pairs(thermostats) do
+                local r = revisions[id]
+
+                local altid = THERM_ID_PREFIX .. id
+                local child = findChild(PARENT_DEVICE, altid)
+                if not child then
+                  log("failed to find device for thermostat " .. altid)
+                else
+                  -- make sure this device has category_num=5
+                  if luup.attr_get("category_num", child) ~= "5" then
+                    luup.attr_set("category_num", "5", child)
+                  end
+                  if luup.attr_get("manufacturer", child) ~= "ecobee" then
+                    luup.attr_set("manufacturer", "ecobee", child)
+                  end
+                  if luup.attr_get("model", child) ~= t.modelNumber then
+                    luup.attr_set("model", t.modelNumber, child)
+                  end
+                  writeVariableFromEcobeeIfChanged(child, ECOBEE_SID, "thermostatRev", r)
+                  writeVariableFromEcobeeIfChanged(child, ECOBEE_SID, "runtimeRev", r)
+                  writeVariableFromEcobeeIfChanged(child, ECOBEE_SID, "quickSaveSetBack", t)
+                  writeVariableFromEcobeeIfChanged(child, ECOBEE_SID, "quickSaveSetForward", t)
+                  writeVariableFromEcobeeIfChanged(child, TEMP_SENSOR_SID, "CurrentTemperature", t)
+                  writeVariableFromEcobeeIfChanged(child, TEMP_SETPOINT_HEAT_SID, "CurrentSetpoint", t)
+                  writeVariableFromEcobeeIfChanged(child, TEMP_SETPOINT_COOL_SID, "CurrentSetpoint", t)
+                  writeVariableFromEcobeeIfChanged(child, HVAC_FAN_SID, "Mode", t)
+                  writeVariableFromEcobeeIfChanged(child, HVAC_FAN_SID, "FanStatus", t)
+                  writeVariableFromEcobeeIfChanged(child, HVAC_USER_SID, "ModeStatus", t)
+                  writeVariableFromEcobeeIfChanged(child, HA_DEVICE_SID, "LastUpdate", t)
+                  writeVariableFromEcobeeIfChanged(child, HA_DEVICE_SID, "CommFailure", r)
+                  writeVariableFromEcobeeIfChanged(child, HA_DEVICE_SID, "Commands", t)
+                end
+
+                altid = HUMID_ID_PREFIX .. id
+                child = findChild(PARENT_DEVICE, altid)
+                if not child then
+                  log("failed to find device for humidistat " .. altid)
+                else
+                  -- make sure this device has category_num=16
+                  if luup.attr_get("category_num", child) ~= "16" then
+                    luup.attr_set("category_num", "16", child)
+                  end
+                  writeVariableFromEcobeeIfChanged(child, HUMIDITY_SENSOR_SID, "CurrentLevel", t)
+                  writeVariableFromEcobeeIfChanged(child, HA_DEVICE_SID, "LastUpdate", t)
+                  writeVariableFromEcobeeIfChanged(child, HA_DEVICE_SID, "CommFailure", r)
+                end
+                  
+                altid = HOUSE_ID_PREFIX .. id
+                child = findChild(PARENT_DEVICE, altid)
+                if not child then
+                  log("failed to find device for house " .. altid)
+                else
+                  -- make sure this device has category_num=3
+                  if luup.attr_get("category_num", child) ~= "3" then
+                    luup.attr_set("category_num", "3", child)
+                  end
+                  writeVariableFromEcobeeIfChanged(child, HOUSE_STATUS_SID, "OccupancyState", t)
+                  writeVariableFromEcobeeIfChanged(child, SWITCH_POWER_SID, "Status", t)
+                  writeVariableFromEcobeeIfChanged(child, ECOBEE_SID, "currentEventType", t)
+                  writeVariableFromEcobeeIfChanged(child, ECOBEE_SID, "currentClimateRef", t)
+                  writeVariableFromEcobeeIfChanged(child, HA_DEVICE_SID, "LastUpdate", t)
+                  writeVariableFromEcobeeIfChanged(child, HA_DEVICE_SID, "CommFailure", r)
+                end
+              end  -- for
+            end  -- if thermostats
+          end  -- if #changed > 0
+
+        end -- if new or old (out of sync)
+      end -- session state
+    end -- getStatus()
+
+    --[[
+    Functions that change thermostat state
+    ]]--
+
+    -- if func.params.coolHoldTemp, func.params.heatHoldTemp or func.params.fan are nil,
+    -- use the current device's state to supply the missing values.
+    -- if selection is nil, we will make our own.
+    local function setHold(session, selection, lul_device, func)
+      debug("in setHold()")
+
+      lul_device = findSibling(lul_device)
+      if not lul_device then
+        task("Unable to find sibling thermostat device; aborting setHold.")
+        return false
+      end
+
+      selection = selection or getSelection(session, lul_device)
+
+      if not func.params.heatHoldTemp then
+        local heatSetpoint = luup.variable_get(TEMP_SETPOINT_HEAT_SID, "CurrentSetpoint", lul_device)
+        func.params.heatHoldTemp = heatSetpoint and upnpToEcobee(TEMP_SETPOINT_HEAT_SID, "SetCurrentSetpoint",
+                                                     "NewCurrentSetpoint", { NewCurrentSetpoint = heatSetpoint })
+                                                 or ecobee.HEAT_OFF
+      end
+      
+      if not func.params.coolHoldTemp then
+        local coolSetpoint = luup.variable_get(TEMP_SETPOINT_COOL_SID, "CurrentSetpoint", lul_device)
+        func.params.coolHoldTemp = coolSetpoint and upnpToEcobee(TEMP_SETPOINT_COOL_SID, "SetCurrentSetpoint",
+                                                     "NewCurrentSetpoint", { NewCurrentSetpoint = coolSetpoint })
+                                                 or ecobee.COOL_OFF
+      end
+
+      if not func.params.fan then
+        local fan = luup.variable_get(HVAC_FAN_SID, "Mode", lul_device)
+        func.params.fan = fan and upnpToEcobee(HVAC_FAN_SID, "SetMode", "NewMode", { NewMode=fan }) or "auto"
+      end
+
+      local success = updateThermostats(session, ecobee.thermostatsUpdateOptions(selection, { func }))
+      if success then getStatusSoon() end
+      return success
+    end
+
+    -- "away" function for binary switch device against Si thermostats
+    -- want to use a real quickSave event but must use this for now.
+    local function quickSave(session, selection, lul_device)
+
+      local heatSetpoint = luup.variable_get(TEMP_SETPOINT_HEAT_SID, "CurrentSetpoint", lul_device)
+      heatSetpoint = tonumber(heatSetpoint)
+      local heatHoldTemp = (not heatSetpoint) and ecobee.HEAT_OFF or
+                             upnpToEcobee(TEMP_SETPOINT_HEAT_SID, "SetCurrentSetpoint",
+                                          "NewCurrentSetpoint", { NewCurrentSetpoint = heatSetpoint })
+      local coolSetpoint = luup.variable_get(TEMP_SETPOINT_COOL_SID, "CurrentSetpoint", lul_device)
+      coolSetpoint = tonumber(coolSetpoint)
+      local coolHoldTemp = (not coolSetpoint) and ecobee.COOL_OFF or
+                             upnpToEcobee(TEMP_SETPOINT_COOL_SID, "SetCurrentSetpoint",
+                                          "NewCurrentSetpoint", { NewCurrentSetpoint = coolSetpoint })
+      local quickSaveSetBack  = luup.variable_get(ECOBEE_SID, "quickSaveSetBack", lul_device)
+      quickSaveSetBack = tonumber(quickSaveSetBack) or 40 -- TODO
+      local quickSaveSetForward = luup.variable_get(ECOBEE_SID, "quickSaveSetForward", lul_device)
+      quickSaveSetForward = tonumber(quickSaveSetForward) or 40 -- TODO
+
+      local func = ecobee.setHoldFunction(nil, nil, "indefinite")
+      func.params.coolRelativeTemp = quickSaveSetForward
+      func.params.heatRelativeTemp = quickSaveSetBack
+      func.params.isTemperatureRelative = false
+      func.params.coolHoldTemp = (coolHoldTemp == ecobee.COOL_OFF) and coolHoldTemp or coolHoldTemp + quickSaveSetForward
+      func.params.heatHoldTemp = (heatHoldTemp == ecobee.HEAT_OFF) and heatHoldTemp or heatHoldTemp - quickSaveSetBack
+      func.params.isTemperatureAbsolute = true
+      return setHold(session, selection, lul_device, func)
+    end
+
+    -- "away" function for binary switch device against EMS thermostats
+    local function setOccupied(session, selection, lul_device, occupied)
+      local success = updateThermostats(session, ecobee.thermostatsUpdateOptions(selection, { ecobee.setOccupiedFunction(occupied, "indefinite") }))
+      if success then getStatusSoon() end
+      return success
+    end
+
+    -- "home" function for all thermostats
+    local function resumeProgram(session, selection, calls)
+      calls = calls or 1
+      local functions = {}
+      for i = 1,calls do
+        functions[#functions + 1] = ecobee.resumeProgramFunction()
+      end
+      local success = updateThermostats(session, ecobee.thermostatsUpdateOptions(selection, functions))
+      if success then getStatusSoon() end
+      return success
+    end
+
+    local function isEmsThermostat(lul_device)
+      local model = luup.attr_get("model", lul_device)
+      return model and string.find(model, "Ems") ~= nil
+    end
+
+    -- setAway will set the thermostat into "away" mode.
+    -- For non-EMS thermostats, Away -> "Quick Save"-like setHold; and Home -> resumeProgram x3.
+    -- For EMS thermostats, Away -> setOccupied occupied=false; and Home -> resumeProgram x3.
+    -- The home/away state is calculated based on whether one of these holds is the currently
+    -- running event.
+
+    local function setAway(session, lul_device, away)
+      debug("in setAway()")
+
+      lul_device = findSibling(lul_device)
+      if not lul_device then
+        task("Unable to find sibling thermostat device; aborting setAway.")
+        return false
+      end
+
+      local selection = getSelection(session, lul_device)
+
+      if away then
+        return isEmsThermostat(lul_device) and setOccupied(session, selection, lul_device, false) or quickSave(session, selection, lul_device)
+      else
+        return resumeProgram(session, selection, 3)
+      end
+    end
+
+    function poll_ecobee()
+      -- debug("in poll_ecobee()")
+
+      task("Clearing...", TASK_SUCCESS)
+
+      getStatus()
+
+      -- set up the next poll
+      local poll = readVariableOrInit(PARENT_DEVICE, ECOBEE_SID, "poll", tostring(DEFAULT_POLL))
+      debug("polling device " .. PARENT_DEVICE .. " again in " .. poll .. " seconds")
+      luup.call_timer("poll_ecobee", 1, poll, "", "")
+    end
+
+    function init(lul_device)
+      log("plugin version " .. PLUGIN_VERSION .. " starting up...", 50)
+
+      if (luup.version_branch &lt; 1 or luup.version_major &lt; 5 or luup.version_minor &lt; 408 ) then
+        task("Version 1.5.408 minimum required to run")
+        return false
+      end
+
+      PARENT_DEVICE = lul_device
+
+      -- ecobeeLog = io.open("/tmp/ecobee." .. tostring(lul_device) .. ".log", "a")
+
+      getVeraTemperatureScale()
+
+      -- perform the first poll 5-10 seconds from now
+
+      local soon = tonumber(SOON)
+      soon = soon + math.random(0,soon)
+
+      debug("polling ecobee.com " .. PARENT_DEVICE .. " in " .. soon .. " seconds")
+
+      luup.call_timer("poll_ecobee", 1, tostring(soon), "", "")
+    end
+  </functions>
+  <startup>init</startup>
+  <actionList>
+    <action>
+      <serviceId>urn:ecobee-com:serviceId:Ecobee1</serviceId>
+      <name>GetPin</name>
+      <run>
+        local session = loadSession()
+        debug("Attempting to getPin...")
+        local ecobeePin = getPin(session)
+        if ecobeePin then
+          task("Register at ecobee.com now: " .. ecobeePin)
+          writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "DisplayLabel", "My Apps PIN:")
+          writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "DisplayValue", ecobeePin)
+        end
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:ecobee-com:serviceId:Ecobee1</serviceId>
+      <name>SetStatus</name>
+      <run>
+        luup.variable_set(ECOBEE_SID, "status", lul_settings.status or "0", lul_device)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:ecobee-com:serviceId:Ecobee1</serviceId>
+      <name>GetStatus</name>
+      <run>
+        return luup.variable_get(ECOBEE_SID, "status", lul_device)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:HouseStatus1</serviceId>
+      <name>SetOccupancyState</name>
+      <run>
+        local away
+        if (lul_settings.NewOccupancyState == "Occupied") then
+          away = false
+        elseif (lul_settings.NewOccupancyState == "Unoccupied") then
+          away = true
+        else
+          log("SetOccupancyState received invalid arg: " .. tostring(lul_settings.NewOccupancyState))
+          return
+        end
+ 
+        if not setAway(loadSession(), lul_device, away) then
+          task("Failed to send away command.")
+        end
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:HouseStatus1</serviceId>
+      <name>GetOccupancyState</name>
+      <run>
+        return luup.variable_get(HOUSE_STATUS_SID, "OccupancyState", lul_device)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:SwitchPower1</serviceId>
+      <name>GetStatus</name>
+      <run>
+        return luup.variable_get(SWITCH_POWER_SID, "Status", lul_device)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:SwitchPower1</serviceId>
+      <name>SetTarget</name>
+      <run>
+        local away
+        if (lul_settings.newTargetValue == "1") then
+          away = false
+        elseif (lul_settings.newTargetValue == "0") then
+          away = true
+        else
+          log("SetTarget received invalid arg: " .. tostring(lul_settings.newTargetValue))
+          return
+        end
+
+        if not setAway(loadSession(), lul_device, away) then
+          task("Failed to send away command.")
+        end
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:SwitchPower1</serviceId>
+      <name>GetTarget</name>
+      <run>
+        return luup.variable_get(SWITCH_POWER_SID, "Status", lul_device)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:TemperatureSensor1</serviceId>
+      <name>GetApplication</name>
+      <run>
+        return ecobeeToUpnp(TEMP_SENSOR_SID, "Application")
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:TemperatureSensor1</serviceId>
+      <name>SetApplication</name>
+      <run>
+        -- no point yet that I know
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:TemperatureSensor1</serviceId>
+      <name>GetCurrentTemperature</name>
+      <run>
+        return luup.variable_get(TEMP_SENSOR_SID, "CurrentTemperature", lul_device)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:TemperatureSetpoint1_Heat</serviceId>
+      <name>GetApplication</name>
+      <run>
+        return ecobeeToUpnp(TEMP_SETPOINT_HEAT_SID, "Application")
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:TemperatureSetpoint1_Heat</serviceId>
+      <name>SetCurrentSetpoint</name>
+      <run>
+        local heatHoldTemp = upnpToEcobee(TEMP_SETPOINT_HEAT_SID, "SetCurrentSetpoint", "NewCurrentSetpoint", lul_settings)
+        local session = loadSession()
+        local func = ecobee.setHoldFunction(nil, heatHoldTemp, "indefinite")
+        if not setHold(session, nil, lul_device, func) then
+          task("Failed to set heat temperature setpoint.")
+        end
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:TemperatureSetpoint1_Heat</serviceId>
+      <name>GetCurrentSetpoint</name>
+      <run>
+        return luup.variable_get(TEMP_SETPOINT_HEAT_SID, "CurrentSetpoint", lul_device)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:TemperatureSetpoint1_Cool</serviceId>
+      <name>GetApplication</name>
+      <run>
+        return ecobeeToUpnp(TEMP_SETPOINT_COOL_SID, "Application")
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:TemperatureSetpoint1_Cool</serviceId>
+      <name>SetCurrentSetpoint</name>
+      <run>
+        local coolHoldTemp = upnpToEcobee(TEMP_SETPOINT_COOL_SID, "SetCurrentSetpoint", "NewCurrentSetpoint", lul_settings)
+        local session = loadSession()
+        local func = ecobee.setHoldFunction(coolHoldTemp, nil, "indefinite")
+        if not setHold(session, nil, lul_device, func) then
+          task("Failed to set cool temperature setpoint.")
+        end
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:TemperatureSetpoint1_Cool</serviceId>
+      <name>GetCurrentSetpoint</name>
+      <run>
+        return luup.variable_get(TEMP_SETPOINT_COOL_SID, "CurrentSetpoint", lul_device)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:HVAC_UserOperatingMode1</serviceId>
+      <name>SetModeTarget</name>
+      <run>
+        -- tell the ecobee to switch to lul_settings.NewModeTarget
+        local hvacMode = upnpToEcobee(HVAC_USER_SID, "SetModeTarget", "NewModeTarget", lul_settings)
+        local session = loadSession()
+        local selection = getSelection(session, lul_device) 
+        if hvacMode and updateThermostats(session, ecobee.thermostatsUpdateOptions(selection, nil, 
+                                                         { settings = { hvacMode = hvacMode } })) then
+          getStatusSoon()
+        else
+          task("Failed to set new hvacMode to " .. tostring(hvacMode))
+        end
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:HVAC_UserOperatingMode1</serviceId>
+      <name>GetModeTarget</name>
+      <run>
+        return luup.variable_get(HVAC_USER_SID, "ModeTarget", lul_device) or "AutoChangeOver"
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:HVAC_UserOperatingMode1</serviceId>
+      <name>GetModeStatus</name>
+      <run>
+        return luup.variable_get(HVAC_USER_SID, "ModeStatus", lul_device)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:HVAC_FanOperatingMode1</serviceId>
+      <name>SetMode</name>
+      <run>
+        local session = loadSession()
+        local func = ecobee.setHoldFunction(nil, nil, "indefinite")
+        func.params.fan = upnpToEcobee(HVAC_FAN_SID, "SetMode", "NewMode", lul_settings)
+        if not setHold(session, nil, lul_device, func) then
+          task("Failed to set fan mode to " .. tostring(mode))
+        end
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:HVAC_FanOperatingMode1</serviceId>
+      <name>GetMode</name>
+      <run>
+        return luup.variable_get(HVAC_FAN_SID, "Mode", lul_device) or "Auto"
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:HVAC_FanOperatingMode1</serviceId>
+      <name>GetFanStatus</name>
+      <run>
+        return luup.variable_get(HVAC_FAN_SID, "FanStatus", lul_device) or "Off"
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:ecobee-com:serviceId:Ecobee1</serviceId>
+      <name>ResumeProgram</name>
+      <run>
+        local session = loadSession()
+        return resumeProgram(session, getSelection(session, lul_device), 3)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:ecobee-com:serviceId:Ecobee1</serviceId>
+      <name>SendMessage</name>
+      <run>
+        local session = loadSession()
+        local selection = getSelection(session, lul_device)
+        local functions = { ecobee.sendMessageFunction(lul_settings.MessageText) }
+        return updateThermostats(session, ecobee.thermostatsUpdateOptions(selection, functions))
+      </run>
+    </action>
+  </actionList>
+</implementation>
+
