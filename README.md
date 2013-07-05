@@ -236,6 +236,10 @@ Thanks to [ecobee][] and their enthusiastic customers, and the helpful contribut
 
 ## History ##
 
+### 2013-06-17    v0.8
+
+* Worked around file name clash on service ID `urn:upnp-org:serviceId:HouseStatus1`.
+
 ### 2013-05-31    v0.7
 
 * Now require users to request a PIN from ecobee.com by pressing the `Get PIN` button on the ecobee device on the Vera dashboard.
