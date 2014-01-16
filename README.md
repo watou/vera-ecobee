@@ -183,11 +183,11 @@ Send a text message to a thermostat's display screen.  The text message can be u
 
 ## Notes and Limitations ##
 
-* Only works with Vera UI5 1.5.408 or later.
+* Works with Vera UI5 1.5.408 or later.
 
 * Updates to the state of thermostat and humidistat devices can take up to the polling number of seconds (60 by default) to be reflected in the UPnP devices (or as quickly as 5 seconds).
 
-* One Vera will only maintain a single ecobee.com authentication, so creating multiple instances of the ecobee device will not request multiple PINs for authentication.  This means that a single Vera cannot be used to manage instances of the ecobee device authenticated against multiple ecobee.com accounts.  The other choice was to require that each instance of the ecobee device request a PIN against all different ecobee.com user accounts, which seemed less useful in practice.  So the only scenario that works currently is where a single ecobee.com user wants to authenticate a single Vera, and on that Vera, there can be multiple instances of the ecobee device connected to the same ecobee.com user account (but with different selectionMatches specified in the Advanced tab variables to make doing so useful).  Please contact [me][] if your requirements differ.
+* There is currently no way to determine the current running state of the HVAC system (Heating, Cooling, FanOnly, Idle).  Ecobee has said that they plan on adding this capability to the API in the future but as of this writing there is no ETA.
 
 [me]: http://forum.micasaverde.com/index.php?action=profile;u=19018
 
@@ -236,9 +236,13 @@ Thanks to [ecobee][] and their enthusiastic customers, and the helpful contribut
 
 ## History ##
 
-### 2013-06-17    v0.8
+### 2014-01-16    v0.9
 
-* Worked around file name clash on service ID `urn:upnp-org:serviceId:HouseStatus1`.
+Fixed:
+
+* GetModeTarget always returns AutoChangeOver ([#4](https://github.com/watou/vera-ecobee-thermostat/issues/4))
+* Remove all code/doc for multiple app instance restrictions ([#5](https://github.com/watou/vera-ecobee-thermostat/issues/5))
+* Do not forget tokens on API "auth" errors, only on refresh request ([#6](https://github.com/watou/vera-ecobee-thermostat/issues/6))
 
 ### 2013-05-31    v0.7
 

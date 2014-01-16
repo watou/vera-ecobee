@@ -420,13 +420,6 @@ copy_house_status_file() {
     local function saveSession(session)
       if session.error then
         log("Error: " .. tostring(session.error) .. ": " .. tostring(session.error_description))
-        if ecobee.isAuthError(session.error) and session.error ~= "authorization_pending" then
-          log("Encountered authorization error; forgetting tokens.")
-          session.auth_token = nil
-          session.access_token = nil
-          session.token_type = nil
-          session.refresh_token = nil
-        end
       end
 
       writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "auth_token",    session.auth_token or "")
@@ -493,33 +486,6 @@ copy_house_status_file() {
 
       local session = loadSession()
 
-      -- attempt to copy another instance's auth_token if we don't have one yet
-      -- as long as it uses the same scope we do
-
-      if not session.auth_token then
-        local device_type = luup.devices[PARENT_DEVICE].device_type
-        for k,v in pairs(luup.devices) do
-          if k ~= PARENT_DEVICE and device_type == v.device_type then
-            local auth_token = luup.variable_get(ECOBEE_SID, "auth_token", k)
-            local scope = luup.variable_get(ECOBEE_SID, "scope", k)
-            if auth_token and auth_token ~= "" and scope == session.scope then
-              session.auth_token = auth_token
-              session.access_token = nil
-              session.token_type = nil
-              session.refresh_token = nil
-              saveSession(session)
-
-              writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "DisplayLabel", "")
-              writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "DisplayValue", "")
-              debug("Copied auth_token " .. auth_token .. " from sibling " .. tostring(k))
-              break
-            end
-          end
-        end
-      end
-
-      -- if no other instances had an auth_token for us to copy, ask user to request PIN
-
       if not session.auth_token then
         task("Not yet authorized. Press 'Get PIN' once; wait for PIN; enter at ecobee.com.")
 
@@ -527,27 +493,6 @@ copy_house_status_file() {
         if not session.refresh_token then
           debug("About to getTokens...")
           getTokens(session)
-          if session.refresh_token then
-
-            -- having successfully registered the PIN, this auth_token is now valid, so
-            -- distribute this auth_token to all instances of this device type (as long
-            -- as they use the same scope we do) since one user can only have one instance
-            -- of this app authorized at one time
-
-            local device_type = luup.devices[PARENT_DEVICE].device_type
-            for k,v in pairs(luup.devices) do
-              if k ~= PARENT_DEVICE and device_type == v.device_type then
-                local scope = luup.variable_get(ECOBEE_SID, "scope", k)
-                if scope == session.scope then
-                  writeVariableIfChanged(k, ECOBEE_SID, "auth_token", session.auth_token)
-                  writeVariableIfChanged(k, ECOBEE_SID, "access_token", "")
-                  writeVariableIfChanged(k, ECOBEE_SID, "token_type", "")
-                  writeVariableIfChanged(k, ECOBEE_SID, "refresh_token", "")
-                  debug("Copied auth_token " .. session.auth_token .. " to sibling " .. tostring(k))
-                end
-              end
-            end
-          end
         end
 
         if not session.refresh_token then
@@ -1080,6 +1025,7 @@ copy_house_status_file() {
         local selection = getSelection(session, lul_device) 
         if hvacMode and updateThermostats(session, ecobee.thermostatsUpdateOptions(selection, nil, 
                                                          { settings = { hvacMode = hvacMode } })) then
+          writeVariableIfChanged(lul_device, HVAC_USER_SID, "ModeTarget", lul_settings.NewModeTarget)
           getStatusSoon()
         else
           task("Failed to set new hvacMode to " .. tostring(hvacMode))
