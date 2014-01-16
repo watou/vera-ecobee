@@ -3,6 +3,7 @@
 
 ![Devices in Vera](http://cocu.la/vera/ecobee/images/shot4.jpg)
 
+**Currently in development**
 
 ## Purpose ##
 This plugin will monitor and control your [ecobee][] thermostat(s) through your [Vera][] home controller.
@@ -25,7 +26,7 @@ First, login to your web portal at [ecobee][] and switch to the [settings tab][]
 
 ### Plugin Authorization with ecobee.com ###
 
-Ecobee uses the [OAuth 2.0](http://oauth.net/) framework for authorizing client applications, such as this plugin.  The practical implication of this is that you do not specify your user name and password in the plugin's settings; instead you grant access by entering a four-character PIN in the ecobee web portal when presented with one by the plugin.
+Ecobee uses the [OAuth 2.0](http://oauth.net/) framework for authorizing client applications, such as this plugin.  The practical implication of this is that you do not specify your user name and password in the plugin's settings; instead you grant access by entering a four-character PIN in the ecobee web portal when presented with one by the plugin.  _Please note that one ecobee account can only authorize a single plugin at one time. If you authorize the plugin from a different Vera, it will invalidate any previous authorization of the plugin for that ecobee account._
 
 Upon installing the ecobee plugin, press the `Get PIN` button on the ecobee device.  The plugin will attempt to connect with the ecobee.com servers and obtain a four-character PIN in order to authorize the plugin to access your ecobee.com account.  This PIN will be displayed on the Vera dashboard on the ecobee device that was created at installation.
 
@@ -242,6 +243,10 @@ Fixed:
 * GetModeTarget always returns AutoChangeOver ([#4](https://github.com/watou/vera-ecobee-thermostat/issues/4))
 * Remove all code/doc for multiple app instance restrictions ([#5](https://github.com/watou/vera-ecobee-thermostat/issues/5))
 * Do not forget tokens on API "auth" errors, only on refresh request ([#6](https://github.com/watou/vera-ecobee-thermostat/issues/6))
+
+### 2013-06-17    v0.8
+  
+* Worked around file name clash on service ID `urn:upnp-org:serviceId:HouseStatus1`.
 
 ### 2013-05-31    v0.7
 

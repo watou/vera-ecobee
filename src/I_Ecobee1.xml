@@ -127,7 +127,7 @@ copy_house_status_file() {
     end
 
     -- constants
-    local PLUGIN_VERSION = "0.8"
+    local PLUGIN_VERSION = "0.9"
     local ECOBEE_SID = "urn:ecobee-com:serviceId:Ecobee1"
     local HOUSE_STATUS_SID = "urn:upnp-org:serviceId:HouseStatus1"
     local TEMP_SENSOR_SID = "urn:upnp-org:serviceId:TemperatureSensor1"
