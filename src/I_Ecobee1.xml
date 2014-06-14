@@ -2,7 +2,7 @@
 <!-- 
  MiOS (Vera) Plugin for ecobee Thermostats
 
- Copyright (C) 2013  John W. Cocula and others
+ Copyright (C) 2013-2014  John W. Cocula and others
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -127,7 +127,7 @@ copy_house_status_file() {
     end
 
     -- constants
-    local PLUGIN_VERSION = "0.9"
+    local PLUGIN_VERSION = "1.0"
     local ECOBEE_SID = "urn:ecobee-com:serviceId:Ecobee1"
     local HOUSE_STATUS_SID = "urn:upnp-org:serviceId:HouseStatus1"
     local TEMP_SENSOR_SID = "urn:upnp-org:serviceId:TemperatureSensor1"
@@ -136,6 +136,7 @@ copy_house_status_file() {
     local HUMIDITY_SENSOR_SID = "urn:micasaverde-com:serviceId:HumiditySensor1"
     local HVAC_FAN_SID = "urn:upnp-org:serviceId:HVAC_FanOperatingMode1"
     local HVAC_USER_SID = "urn:upnp-org:serviceId:HVAC_UserOperatingMode1"
+    local HVAC_STATE_SID = "urn:micasaverde-com:serviceId:HVAC_OperatingState1"
     local HA_DEVICE_SID = "urn:micasaverde-com:serviceId:HaDevice1"
     local SWITCH_POWER_SID = "urn:upnp-org:serviceId:SwitchPower1"
     local MCV_ENERGY_METERING_SID = "urn:micasaverde-com:serviceId:EnergyMetering1"
@@ -233,6 +234,7 @@ copy_house_status_file() {
       [ECOBEE_SID] = {
         ["thermostatRev"] = function(r) return r.thermostatRev end,
         ["runtimeRev"] = function(r) return r.runtimeRev end,
+        ["equipmentStatus"] = function(r) return r.equipmentStatus or "unknown" end,
         ["quickSaveSetBack"] = function(t) return tostring(t.settings.quickSaveSetBack) end,
         ["quickSaveSetForward"] = function(t) return tostring(t.settings.quickSaveSetForward) end,
         ["currentEventType"] = function(t)
@@ -293,7 +295,7 @@ copy_house_status_file() {
           end
         end,
         ["FanStatus"] = function(t)
-          return "Off" -- TODO, not currently supported by ecobee API
+          return t.equipmentStatus and (string.find(t.equipmentStatus, "fan") and "On" or "Off") or "Unknown"
         end
       },
       [HVAC_USER_SID] = {
@@ -306,12 +308,27 @@ copy_house_status_file() {
           end
         end
       },
+      [HVAC_STATE_SID] = {
+        ["ModeState"] = function(t)
+          -- return "Heating", "Cooling", "FanOnly", "Idle", "PendingHeat", "PendingCool", "Vent"
+          -- from list of heatPump, compCool1, compCool2, auxHeat1, auxHeat2, auxHeat3, fan,
+          --              humidifier, dehumidifier, ventilator, economizer, compHotWater, auxHotWater
+          if     (t.equipmentStatus == "")                then return "Idle"
+          elseif (t.equipmentStatus == "fan")             then return "FanOnly"
+          elseif (string.find(t.equipmentStatus, "eat"))  then return "Heating"
+          elseif (string.find(t.equipmentStatus, "ool"))  then return "Cooling"
+          elseif (string.find(t.equipmentStatus, "vent")) then return "Vent"
+          elseif (t.settings.hvacMode == "off")           then return "Off"
+          else return ""
+          end
+        end
+      },
       [HA_DEVICE_SID] = {
        ["LastUpdate"] = function(t) return tostring(toSeconds(t.runtime.lastModified)) end,
        ["CommFailure"] = function(r) return r.connected and "0" or "1" end,
        ["Commands"] = function(t)
          local commands = { "hvac_off", "hvac_auto", "hvac_cool",  "hvac_heat",
-                            "fan_auto", "fan_on",    "resume_program" }
+                            "fan_auto", "fan_on",    "hvac_state", "resume_program" }
          if t.runtime.desiredHeat ~= ecobee.HEAT_OFF then
            commands[#commands + 1] = "heating_setpoint"
          end
@@ -501,7 +518,7 @@ copy_house_status_file() {
         end
 
         debug("Fetching revisions...")
-        local revisions = getThermostatSummary(session, ecobee.selectionObject(session.selectionType, session.selectionMatch))
+        local revisions = getThermostatSummary(session, ecobee.selectionObject(session.selectionType, session.selectionMatch, { equipmentStatus = true }))
         if not revisions then
           log("Unable to getThermostatSummary; skipping status update.")
           return
@@ -541,7 +558,7 @@ copy_house_status_file() {
           -- do a full thermostat fetch and create child devices
           log("Synchronizing devices with ecobee.com...")
 
-          local includes = { settings=true, runtime=true, events=true, program=true, location=true }
+          local includes = { settings=true, runtime=true, events=true, program=true, location=true, equipmentStatus=true }
           local options = ecobee.selectionObject(session.selectionType, session.selectionMatch, includes)
           local thermostats = getThermostats(session, options)
           if thermostats then
@@ -556,6 +573,7 @@ copy_house_status_file() {
                                 "D_EcobeeThermostat1.xml", "",
                                 ecobeeToUpnpParam(ECOBEE_SID, "thermostatRev", r) ..
                         "\n" .. ecobeeToUpnpParam(ECOBEE_SID, "runtimeRev", r) ..
+                        "\n" .. ecobeeToUpnpParam(ECOBEE_SID, "equipmentStatus", r) ..
                         "\n" .. ecobeeToUpnpParam(ECOBEE_SID, "quickSaveSetBack", t) .. 
                         "\n" .. ecobeeToUpnpParam(ECOBEE_SID, "quickSaveSetForward", t) .. 
                         "\n" .. ecobeeToUpnpParam(TEMP_SENSOR_SID, "CurrentTemperature", t) ..
@@ -564,6 +582,7 @@ copy_house_status_file() {
                         "\n" .. ecobeeToUpnpParam(HVAC_FAN_SID, "Mode", t) ..
                         "\n" .. ecobeeToUpnpParam(HVAC_FAN_SID, "FanStatus", t) ..
                         "\n" .. ecobeeToUpnpParam(HVAC_USER_SID, "ModeStatus", t) ..
+                        "\n" .. ecobeeToUpnpParam(HVAC_STATE_SID, "ModeState", t) ..
                         "\n" .. ecobeeToUpnpParam(HA_DEVICE_SID, "LastUpdate", t) ..
                         "\n" .. ecobeeToUpnpParam(HA_DEVICE_SID, "CommFailure", r) ..
                         "\n" .. ecobeeToUpnpParam(HA_DEVICE_SID, "Commands", t) ..
@@ -604,7 +623,7 @@ copy_house_status_file() {
 
         else
 
-          -- see which thermostats have changed settings or runtime values, or connected state
+          -- see which thermostats have changed settings or runtime values, equipment status or connected state
           local changed = {}
           for id,revision in pairs(revisions) do
             local child = findChild(PARENT_DEVICE, THERM_ID_PREFIX .. id)
@@ -613,6 +632,7 @@ copy_house_status_file() {
             else
               if (revision.thermostatRev ~= luup.variable_get(ECOBEE_SID, "thermostatRev", child)) or
                  (revision.runtimeRev ~= luup.variable_get(ECOBEE_SID, "runtimeRev", child)) or 
+                 (revision.equipmentStatus ~= luup.variable_get(ECOBEE_SID, "equipmentStatus", child)) or
                  (revision.connected ~= (luup.variable_get(HA_DEVICE_SID, "CommFailure", child) == "0")) then
                 changed[#changed + 1] = id
               end
@@ -623,7 +643,7 @@ copy_house_status_file() {
 
           if #changed > 0 then
             -- just fetch the changed thermostats from ecobee.com
-            local includes = { settings=true, runtime=true, events=true, program=true }
+            local includes = { settings=true, runtime=true, events=true, program=true, equipmentStatus=true }
             local thermostats = getThermostats(session, ecobee.selectionObject("thermostats", changed, includes))
             if thermostats then
               for id,t in pairs(thermostats) do
@@ -646,6 +666,7 @@ copy_house_status_file() {
                   end
                   writeVariableFromEcobeeIfChanged(child, ECOBEE_SID, "thermostatRev", r)
                   writeVariableFromEcobeeIfChanged(child, ECOBEE_SID, "runtimeRev", r)
+                  writeVariableFromEcobeeIfChanged(child, ECOBEE_SID, "equipmentStatus", r)
                   writeVariableFromEcobeeIfChanged(child, ECOBEE_SID, "quickSaveSetBack", t)
                   writeVariableFromEcobeeIfChanged(child, ECOBEE_SID, "quickSaveSetForward", t)
                   writeVariableFromEcobeeIfChanged(child, TEMP_SENSOR_SID, "CurrentTemperature", t)
@@ -654,6 +675,7 @@ copy_house_status_file() {
                   writeVariableFromEcobeeIfChanged(child, HVAC_FAN_SID, "Mode", t)
                   writeVariableFromEcobeeIfChanged(child, HVAC_FAN_SID, "FanStatus", t)
                   writeVariableFromEcobeeIfChanged(child, HVAC_USER_SID, "ModeStatus", t)
+                  writeVariableFromEcobeeIfChanged(child, HVAC_STATE_SID, "ModeState", t)
                   writeVariableFromEcobeeIfChanged(child, HA_DEVICE_SID, "LastUpdate", t)
                   writeVariableFromEcobeeIfChanged(child, HA_DEVICE_SID, "CommFailure", r)
                   writeVariableFromEcobeeIfChanged(child, HA_DEVICE_SID, "Commands", t)
@@ -1069,7 +1091,7 @@ copy_house_status_file() {
       <serviceId>urn:upnp-org:serviceId:HVAC_FanOperatingMode1</serviceId>
       <name>GetFanStatus</name>
       <run>
-        return luup.variable_get(HVAC_FAN_SID, "FanStatus", lul_device) or "Off"
+        return luup.variable_get(HVAC_FAN_SID, "FanStatus", lul_device) or "Unknown"
       </run>
     </action>
     <action>

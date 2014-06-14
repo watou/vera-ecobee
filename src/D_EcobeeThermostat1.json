@@ -43,6 +43,10 @@
                     "scenegroup": "4"
                 },
                 {
+                    "id": "5",
+                    "scenegroup": "5"
+                },
+                {
                     "id": "6",
                     "scenegroup": "6"
                 },
@@ -68,7 +72,14 @@
                     "top": "0",
                     "left": "1",
                     "x": "1",
-                    "y": "4"
+                    "y": "3"
+                },
+                {
+                    "id": "5",
+                    "top": "3",
+                    "left": "1",
+                    "x": "1",
+                    "y": "1"
                 },
                 {
                     "id": "6",
@@ -362,6 +373,22 @@
                     "ControlCode": "fan_on"
                 },
                 {
+                    "ControlGroup": "5",
+                    "ControlType": "variable",
+                    "top": "0.2",
+                    "left": "0",
+                    "Display": {
+                        "Top": 120,
+                        "Left": 30,
+                        "Width": 100,
+                        "Height": 25,
+                        "Service": "urn:micasaverde-com:serviceId:HVAC_OperatingState1",
+                        "Variable": "ModeState",
+                        "Value": "Idle"
+                    },
+                    "ControlCode": "hvac_state"
+                },
+                {
                     "ControlGroup": "8",
                     "ControlType": "button",
                     "top": "0",
@@ -374,7 +401,7 @@
                         "Top": 120,
                         "Left": 500,
                         "Width": 100,
-                        "Height": 25,
+                        "Height": 25
                     },
                     "Command": {
                         "Service": "urn:ecobee-com:serviceId:Ecobee1",
@@ -759,6 +786,73 @@
                         "lang_tag": "hft_thermostat_coolpoint_goes_over",
                         "text": "_DEVICE_NAME_ cool point goes over _ARGUMENT_VALUE_ degrees"
                     }
+                }
+            ]
+        },
+        {
+            "id": 10,
+            "label": {
+                "lang_tag": "mode_state_changes",
+                "text": "Thermostat Running State Changes"
+            },
+            "serviceId": "urn:micasaverde-com:serviceId:HVAC_OperatingState1",
+            "argumentList": [
+                {
+                    "id": 1,
+                    "dataType": "string",
+                    "defaultValue": "",
+                    "allowedValueList": [
+                        {
+                            "Off": "Off",
+                            "HumanFriendlyText": {
+                                "lang_tag": "hft_hvac_off",
+                                "text": "_DEVICE_NAME_ is off"
+                            }
+                        },
+                        {
+                            "Heating": "Heating",
+                            "HumanFriendlyText": {
+                                "lang_tag": "hft_hvac_heating",
+                                "text": "_DEVICE_NAME_ is heating"
+                            }
+                        },
+                        {
+                            "Cooling": "Cooling",
+                            "HumanFriendlyText": {
+                                "lang_tag": "hft_hvac_cooling",
+                                "text": "_DEVICE_NAME_ is cooling"
+                            }
+                        },
+                        {
+                            "FanOnly": "FanOnly",
+                            "HumanFriendlyText": {
+                                "lang_tag": "hft_hvac_fan_only",
+                                "text": "_DEVICE_NAME_ is running the fan only"
+                            }
+                        },
+                        {
+                            "Idle": "Idle",
+                            "HumanFriendlyText": {
+                                "lang_tag": "hft_hvac_idle",
+                                "text": "_DEVICE_NAME_ is idle"
+                            }
+                        },
+                        {
+                            "Vent": "Vent",
+                            "HumanFriendlyText": {
+                                "lang_tag": "hft_hvac_vent",
+                                "text": "_DEVICE_NAME_ is running ventilator"
+                            }
+                        }
+
+                    ],
+                    "name": "ModeState",
+                    "comparisson": "=",
+                    "prefix": {
+                        "lang_tag": "mode_state",
+                        "text": "ModeState"
+                    },
+                    "suffix": {}
                 }
             ]
         }

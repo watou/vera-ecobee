@@ -1,9 +1,7 @@
 <!--	Vera Plugin for ecobee Thermostats	-->
 
 
-![Devices in Vera](http://cocu.la/vera/ecobee/images/shot4.jpg)
-
-**Currently in development**
+![Devices in Vera](http://cocu.la/vera/ecobee/images/shot5.jpg)
 
 ## Purpose ##
 This plugin will monitor and control your [ecobee][] thermostat(s) through your [Vera][] home controller.
@@ -13,7 +11,7 @@ This plugin will monitor and control your [ecobee][] thermostat(s) through your 
 
 ## Features ##
 
-* Monitor thermostat mode, fan mode, current and set point temperatures, humidity level, current event (if any) and current climate.
+* Monitor thermostat mode, fan mode, current and set point temperatures, humidity level, running states, current event (if any) and current climate.
 * Change HVAC mode and set indefinite holds for temperature set points and fan mode, and allow the program to resume from these holds.
 * Use a QuickSave-like hold event (for Smart thermostats) or SwitchOccupancy event (for EMS thermostats) to set and monitor an "away" state.
 * Perform common functions, such as sending a text message or resuming the program, to an individual thermostat or a group of thermostats.
@@ -26,7 +24,7 @@ First, login to your web portal at [ecobee][] and switch to the [settings tab][]
 
 ### Plugin Authorization with ecobee.com ###
 
-Ecobee uses the [OAuth 2.0](http://oauth.net/) framework for authorizing client applications, such as this plugin.  The practical implication of this is that you do not specify your user name and password in the plugin's settings; instead you grant access by entering a four-character PIN in the ecobee web portal when presented with one by the plugin.  _Please note that one ecobee account can only authorize a single plugin at one time. If you authorize the plugin from a different Vera, it will invalidate any previous authorization of the plugin for that ecobee account._
+Ecobee uses the [OAuth 2.0](http://oauth.net/) framework for authorizing client applications, such as this plugin.  The practical implication of this is that you do not specify your user name and password in the plugin's settings; instead you grant access by entering a four-character PIN in the ecobee web portal when presented with one by the plugin.
 
 Upon installing the ecobee plugin, press the `Get PIN` button on the ecobee device.  The plugin will attempt to connect with the ecobee.com servers and obtain a four-character PIN in order to authorize the plugin to access your ecobee.com account.  This PIN will be displayed on the Vera dashboard on the ecobee device that was created at installation.
 
@@ -97,6 +95,7 @@ Implements these services:
 * `urn:upnp-org:serviceId:TemperatureSensor1`
 * `urn:upnp-org:serviceId:TemperatureSetpoint1_Heat`
 * `urn:upnp-org:serviceId:TemperatureSetpoint1_Cool`
+* `urn:micasaverde-com:serviceId:HVAC_OperatingState1`
 * `urn:micasaverde-com:serviceId:EnergyMetering1`
 * `urn:micasaverde-com:serviceId:HaDevice1`
 * `urn:ecobee-com:serviceId:Ecobee1`
@@ -109,8 +108,9 @@ Variables:
 | urn:upnp-org:serviceId:TemperatureSetpoint1_Heat | CurrentSetpoint | current heat setpoint |
 | urn:upnp-org:serviceId:TemperatureSetpoint1_Cool | CurrentSetpoint | current cool setpoint |
 | urn:upnp-org:serviceId:HVAC_FanOperatingMode1 | Mode | current fan operating mode |
-| urn:upnp-org:serviceId:HVAC_FanOperatingMode1 | FanStatus | `Off` -- not currently supported |
+| urn:upnp-org:serviceId:HVAC_FanOperatingMode1 | FanStatus | `On` or `Off` |
 | urn:upnp-org:serviceId:HVAC_UserOperatingMode1 | ModeStatus | HVAC mode |
+| urn:micasaverde-com:serviceId:HVAC_OperatingState1 | ModeState | Current running status |
 | urn:micasaverde-com:serviceId:HaDevice1 | LastUpdate | seconds since the Epoch GMT since device updated |
 | urn:micasaverde-com:serviceId:HaDevice1 | CommFailure | `0` if connected, `1` if not |
 | urn:micasaverde-com:serviceId:EnergyMetering1 | UserSuppliedWattage | `0,0,0` |
@@ -183,21 +183,17 @@ Send a text message to a thermostat's display screen.  The text message can be u
 
 ## Notes and Limitations ##
 
-* Works with Vera UI5 1.5.408 or later.
+* Works with Vera UI5 1.5.408 or later.    These days, it is only being tested on UI5 1.5.622.
 
 * Updates to the state of thermostat and humidistat devices can take up to the polling number of seconds (60 by default) to be reflected in the UPnP devices (or as quickly as 5 seconds).
-
-* There is currently no way to determine the current running state of the HVAC system (Heating, Cooling, FanOnly, Idle).  Ecobee has said that they plan on adding this capability to the API in the future but as of this writing there is no ETA.
 
 [me]: http://forum.micasaverde.com/index.php?action=profile;u=19018
 
 * The humidistat device currently only implements the humidity sensor service.
 
-* The thermostat device creates the `UserSuppliedWattage` variable, set initially to `0,0,0`, but it doesn't yet do anything else to implement the `urn:micasaverde-com:serviceId:EnergyMetering1` service.
-
 ## License ##
 
-Copyright &copy; 2013  John W. Cocula and others
+Copyright &copy; 2013-2014  John W. Cocula and others
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
@@ -232,9 +228,19 @@ Thanks to [ecobee][] and their enthusiastic customers, and the helpful contribut
 * Report the heating or cooling stage, since ecobee supports multiple heating and cooling stages.
 * More automation.
 * Monitor and manage ecobee's Smart Plugs as individual `urn:schemas-upnp-org:device:BinaryLight:1` devices when used with Smart thermostats.
-* Implement Humidistat functionality to control humidity from Vera.
+* Implement Humidistat functionality to control humidity from Vera and report running state of humidifier and/or dehumidifier.
+
+See and submit more on [Github](https://github.com/watou/vera-ecobee-thermostat/issues?page=1&state=open).
 
 ## History ##
+
+### 2014-06-13    v1.0
+
+Enhancements:
+
+* Made possible by a recent update to the Ecobee API, the thermostat device now reports the current running state of equipment connected to the thermostat, through the `ModeState` variable. There is a new automation trigger that will run a scene based on the various possible values for `ModeState`.
+* The Vera web UI now shows the current running state on the thermostat's dashboard, under the fan options (see the screenshot at the top of this page).
+* The `FanStatus` now correctly reports `On` or `Off` depending on whether the fan is currently running.
 
 ### 2014-01-16    v0.9
 
