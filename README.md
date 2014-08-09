@@ -234,6 +234,12 @@ See and submit more on [Github](https://github.com/watou/vera-ecobee-thermostat/
 
 ## History ##
 
+### 2014-08-09    v1.1
+
+Fixed:
+
+* Removed bad Vera version checking code so it works on UI7. ([#7](https://github.com/watou/vera-ecobee-thermostat/issues/7))
+
 ### 2014-06-13    v1.0
 
 Enhancements:
