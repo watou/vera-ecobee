@@ -127,7 +127,7 @@ copy_house_status_file() {
     end
 
     -- constants
-    local PLUGIN_VERSION = "1.0"
+    local PLUGIN_VERSION = "1.1"
     local ECOBEE_SID = "urn:ecobee-com:serviceId:Ecobee1"
     local HOUSE_STATUS_SID = "urn:upnp-org:serviceId:HouseStatus1"
     local TEMP_SENSOR_SID = "urn:upnp-org:serviceId:TemperatureSensor1"
@@ -853,11 +853,6 @@ copy_house_status_file() {
 
     function init(lul_device)
       log("plugin version " .. PLUGIN_VERSION .. " starting up...", 50)
-
-      if (luup.version_branch &lt; 1 or luup.version_major &lt; 5 or luup.version_minor &lt; 408 ) then
-        task("Version 1.5.408 minimum required to run")
-        return false
-      end
 
       PARENT_DEVICE = lul_device
 
