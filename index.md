@@ -1,7 +1,7 @@
-<!--	Vera Plugin for ecobee Thermostats	-->
-
-
-![Devices in Vera](http://cocu.la/vera/ecobee/images/shot5.jpg)
+---
+title: Vera Plugin for Ecobee Thermostats
+layout: page
+---
 
 ## Purpose ##
 This plugin will monitor and control your [ecobee][] thermostat(s) through your [Vera][] home controller.
@@ -16,6 +16,11 @@ This plugin will monitor and control your [ecobee][] thermostat(s) through your 
 * Use a QuickSave-like hold event (for Smart thermostats) or SwitchOccupancy event (for EMS thermostats) to set and monitor an "away" state.
 * Perform common functions, such as sending a text message or resuming the program, to an individual thermostat or a group of thermostats.
 
+<figure>
+  <img src="images/screen-shot.jpg" alt="Devices in Vera">
+  <figcaption>An example of the Ecobee devices shown in Vera (UI5).</figcaption>
+</figure>
+
 ## How to Use the Plugin ##
 
 First, login to your web portal at [ecobee][] and switch to the [settings tab][].  Familiarize yourself with the portal, and Choose `My Apps` on the left edge of the screen to enable that view.  Leave this browser window open before proceeding to the next step.
@@ -28,7 +33,10 @@ Ecobee uses the [OAuth 2.0](http://oauth.net/) framework for authorizing client 
 
 Upon installing the ecobee plugin, press the `Get PIN` button on the ecobee device.  The plugin will attempt to connect with the ecobee.com servers and obtain a four-character PIN in order to authorize the plugin to access your ecobee.com account.  This PIN will be displayed on the Vera dashboard on the ecobee device that was created at installation.
 
-![ecobee device prompting to register PIN at ecobee.com](http://cocu.la/vera/ecobee/images/shot4b.jpg)
+<figure>
+  <img src="images/register-pin.jpg" alt="ecobee device prompting to register PIN at ecobee.com">
+  <figcaption>The PIN is displayed on the ecobee device that was created at installation.</figcaption>
+</figure>
 
 Once you see it, you then have ten minutes or less to enter this PIN in the My Apps widget in your ecobee.com web portal.  If the PIN expires, you will have to press the `Get PIN` button again to request a new PIN.
 
@@ -38,9 +46,11 @@ Also, you may want to mark your calendar for next year because this authorizatio
 
 _If you are a **non-commercial customer**, the default values should work for you and **you can skip this section**.  Otherwise, perform this step now._
 
-If you are an Energy Management System (EMS) commercial customer, you must also set values for three variables on the Advanced tab of the ecobee device.
-
-![Advanced tab of the ecobee device](http://cocu.la/vera/ecobee/images/shot2a.jpg)
+<figure>
+  <img src="images/advanced-tab.jpg" alt="Advanced tab of the ecobee device">
+  <figcaption>If you are an Energy Management System (EMS) commercial customer, you must also set values for three variables on the Advanced tab of the ecobee device.
+  </figcaption>
+</figure>
 
 The variables are `scope`, `selectionType` and `selectionMatch` and must be set according to the following rules:
 
