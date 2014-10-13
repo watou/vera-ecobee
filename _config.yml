@@ -2,7 +2,7 @@
 title: Vera Plugin for Ecobee
 description: > # this means to ignore newlines until "baseurl:"
   Monitor and control your Ecobee thermostat(s) through your Vera] home controller.
-baseurl: "/vera-ecobee-thermostat"
+baseurl: "/vera-ecobee"
 url: "http://watou.github.io"
 twitter_username: jcocula
 github_username:  watou

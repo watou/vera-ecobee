@@ -211,7 +211,7 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 
 You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-The source code repository and issue list can be located at <https://github.com/watou/vera-ecobee-thermostat>.
+The source code repository and issue list can be located at <https://github.com/watou/vera-ecobee>.
 
 House icon copyright [Alexander Moore](http://www.mricons.com/show/iconset:vista-inspirate-icons).
 
@@ -240,7 +240,7 @@ Thanks to [ecobee][] and their enthusiastic customers, and the helpful contribut
 * Monitor and manage ecobee's Smart Plugs as individual `urn:schemas-upnp-org:device:BinaryLight:1` devices when used with Smart thermostats.
 * Implement Humidistat functionality to control humidity from Vera and report running state of humidifier and/or dehumidifier.
 
-See and submit more on [Github](https://github.com/watou/vera-ecobee-thermostat/issues?page=1&state=open).
+See and submit more on [Github](https://github.com/watou/vera-ecobee/issues?page=1&state=open).
 
 ## History ##
 
@@ -248,7 +248,7 @@ See and submit more on [Github](https://github.com/watou/vera-ecobee-thermostat/
 
 Fixed:
 
-* Removed bad Vera version checking code so it works on UI7. ([#7](https://github.com/watou/vera-ecobee-thermostat/issues/7))
+* Removed bad Vera version checking code so it works on UI7. ([#7](https://github.com/watou/vera-ecobee/issues/7))
 
 ### 2014-06-13    v1.0
 
@@ -262,9 +262,9 @@ Enhancements:
 
 Fixed:
 
-* GetModeTarget always returns AutoChangeOver ([#4](https://github.com/watou/vera-ecobee-thermostat/issues/4))
-* Remove all code/doc for multiple app instance restrictions ([#5](https://github.com/watou/vera-ecobee-thermostat/issues/5))
-* Do not forget tokens on API "auth" errors, only on refresh request ([#6](https://github.com/watou/vera-ecobee-thermostat/issues/6))
+* GetModeTarget always returns AutoChangeOver ([#4](https://github.com/watou/vera-ecobee/issues/4))
+* Remove all code/doc for multiple app instance restrictions ([#5](https://github.com/watou/vera-ecobee/issues/5))
+* Do not forget tokens on API "auth" errors, only on refresh request ([#6](https://github.com/watou/vera-ecobee/issues/6))
 
 ### 2013-06-17    v0.8
   
