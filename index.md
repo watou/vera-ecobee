@@ -4,7 +4,7 @@ layout: page
 ---
 
 ## Purpose ##
-This plugin will monitor and control your [ecobee][] thermostat(s) through your [Vera][] home controller.
+This plugin will monitor and control your [ecobee][] thermostat(s) through your [Vera][] home controller.  If you have remote sensors connected to your thermostat, they should also be accessible via this plugin.
 
 [ecobee]: http://www.ecobee.com
 [vera]: http://www.micasaverde.com
@@ -12,8 +12,9 @@ This plugin will monitor and control your [ecobee][] thermostat(s) through your 
 ## Features ##
 
 * Monitor thermostat mode, fan mode, current and set point temperatures, humidity level, running states, current event (if any) and current climate.
+* If remote sensors are connected to your Ecobee thermostat, they should appear in the plugin as motion, temperature or humidity sensors, depending on what has been made available from the API.
 * Change HVAC mode and set indefinite holds for temperature set points and fan mode, and allow the program to resume from these holds.
-* Use a QuickSave-like hold event (for Smart thermostats) or SwitchOccupancy event (for EMS thermostats) to set and monitor an "away" state.
+* Set hold events for comfort settings (formerly called climates) or issue SwitchOccupancy events (for EMS thermostats) to set and monitor an "away" state.
 * Perform common functions, such as sending a text message or resuming the program, to an individual thermostat or a group of thermostats.
 
 <figure>
@@ -21,9 +22,15 @@ This plugin will monitor and control your [ecobee][] thermostat(s) through your 
   <figcaption>An example of the Ecobee devices shown in Vera (UI5).</figcaption>
 </figure>
 
+<figure>
+  <img src="images/sensor-devices.jpg" alt="Devices in Vera">
+  <figcaption>An example of the Ecobee remote sensor devices shown in Vera (UI5).</figcaption>
+</figure>
+
+
 ## How to Use the Plugin ##
 
-First, login to your web portal at [ecobee][] and switch to the [settings tab][].  Familiarize yourself with the portal, and Choose `My Apps` on the left edge of the screen to enable that view.  Leave this browser window open before proceeding to the next step.
+First, login to your web portal at [ecobee][] (and switch to the [settings tab][] if you are using the pre-ecobee3 portal).  Familiarize yourself with the portal, and Choose `My Apps` on the left edge of the screen to enable that view.  Leave this browser window open before proceeding to the next step.
 
 [settings tab]: https://www.ecobee.com/home/secure/settings.jsf
 
@@ -149,7 +156,6 @@ Device type: `urn:schemas-ecobee-com:device:EcobeeHouse:1`
 
 Implements these services:
 
-* `urn:upnp-org:serviceId:HouseStatus1`
 * `urn:upnp-org:serviceId:SwitchPower1`
 * `urn:micasaverde-com:serviceId:HaDevice1`
 * `urn:ecobee-com:serviceId:Ecobee1`
@@ -158,10 +164,10 @@ Variables:
 
 | Service ID | Variable | Value |
 |:-----------|:---------|:------|
-| urn:upnp-org:serviceId:HouseStatus1 | OccupancyState | `Occupied` or `Unoccupied` |
-| urn:upnp-org:serviceId:SwitchPower1 | Status | `0` if unoccupied or `1` if occupied |
+| urn:upnp-org:serviceId:SwitchPower1 | Status | `1` if home or `0` otherwise |
 | urn:micasaverde-com:serviceId:HaDevice1 | LastUpdate | seconds since the Epoch GMT since device updated |
 | urn:micasaverde-com:serviceId:HaDevice1 | CommFailure | `0` if connected, `1` if not |
+| urn:ecobee-com:serviceId:Ecobee1 | currentClimateRef | The current climate reference, like `home`, `away`, `wakeup` and `sleep`. |
 | _The following variables are only set when the device is first created, and are not kept in sync if they are changed.  This is done in order to conserve bandwidth and processing time.  Delete the device if you wish it to be re-created with current values._ |
 | urn:ecobee-com:serviceId:Ecobee1 | StreetAddress | The thermostat location street address. |
 | urn:ecobee-com:serviceId:Ecobee1 | City | The thermostat location city. |
@@ -170,6 +176,65 @@ Variables:
 | urn:ecobee-com:serviceId:Ecobee1 | PostalCode | The thermostat location ZIP or Postal code. |
 | urn:ecobee-com:serviceId:Ecobee1 | PhoneNumber | The thermostat owner's phone number. |
 | urn:ecobee-com:serviceId:Ecobee1 | MapCoordinates | The lat/long geographic coordinates of the thermostat location. |
+
+### Occupancy Sensors ###
+
+If you have remote motion sensors connected to your thermostat, the plugin will create devices in Vera.  Refer to Ecobee for how these devices report motion or occupancy.
+
+Device type: `urn:schemas-micasaverde-com:device:MotionSensor:1`
+
+Implements these services:
+
+* `urn:micasaverde-com:serviceId:SecuritySensor1`
+* `urn:micasaverde-com:serviceId:HaDevice1`
+
+Variables:
+
+| Service ID | Variable | Value |
+|:-----------|:---------|:------|
+| urn:micasaverde-com:serviceId:SecuritySensor1 | Tripped | `1` if tripped or `0` otherwise |
+| urn:micasaverde-com:serviceId:SecuritySensor1 | Armed | `1` if armed or `0` otherwise |
+| urn:micasaverde-com:serviceId:SecuritySensor1 | LastTrip | seconds since the Epoch GMT since device tripped |
+| urn:micasaverde-com:serviceId:HaDevice1 | LastUpdate | seconds since the Epoch GMT since device updated |
+| urn:micasaverde-com:serviceId:HaDevice1 | CommFailure | `0` if connected, `1` if not |
+
+### Temperature Sensors ###
+
+If you have remote temperature sensors connected to your thermostat, the plugin will create devices in Vera.
+
+Device type: `urn:schemas-micasaverde-com:device:TemperatureSensor:1`
+
+Implements these services:
+
+* `urn:upnp-org:serviceId:TemperatureSensor1`
+* `urn:micasaverde-com:serviceId:HaDevice1`
+
+Variables:
+
+| Service ID | Variable | Value |
+|:-----------|:---------|:------|
+| urn:upnp-org:serviceId:TemperatureSensor1 | CurrentTemperature | current temperature or -500 (F) if unknown |
+| urn:micasaverde-com:serviceId:HaDevice1 | LastUpdate | seconds since the Epoch GMT since device updated |
+| urn:micasaverde-com:serviceId:HaDevice1 | CommFailure | `0` if connected, `1` if not |
+
+### Humidity Sensors ###
+
+If you have remote humidity sensors connected to your thermostat, the plugin will create devices in Vera.
+
+Device type: `urn:schemas-micasaverde-com:device:HumiditySensor:1`
+
+Implements these services:
+
+* `urn:upnp-org:serviceId:HumiditySensor1`
+* `urn:micasaverde-com:serviceId:HaDevice1`
+
+Variables:
+
+| Service ID | Variable | Value |
+|:-----------|:---------|:------|
+| urn:upnp-org:serviceId:HumiditySensor1 | CurrentLevel| current relative humidity level (percent) or 0 if unknown |
+| urn:micasaverde-com:serviceId:HaDevice1 | LastUpdate | seconds since the Epoch GMT since device updated |
+| urn:micasaverde-com:serviceId:HaDevice1 | CommFailure | `0` if connected, `1` if not |
 
 
 ## UPnP Actions ##
@@ -190,12 +255,20 @@ Send a text message to a thermostat's display screen.  The text message can be u
 |:------------|:----------|:------------------------------|
 | MessageText | In        | Up to 500 characters of text. |
 
+### SetClimateHold ###
+
+Set a hold event to the setpoint and fan settings contained within a named climate reference, like `home`, `away`, `wakeup` and `sleep`.
+
+| Parameter      | Direction | Value                         |
+|:-----------   -|:----------|:------------------------------|
+| HoldClimateRef | In        | The named climate reference.  |
+
 
 ## Notes and Limitations ##
 
 * Works with Vera UI5 1.5.408 or later.    These days, it is only being tested on UI5 1.5.622.
 
-* Updates to the state of thermostat and humidistat devices can take up to the polling number of seconds (60 by default) to be reflected in the UPnP devices (or as quickly as 5 seconds).
+* Updates to the state of thermostat and humidistat devices can take up to the polling number of seconds (180 by default) to be reflected in the UPnP devices (or as quickly as 5 seconds).
 
 [me]: http://forum.micasaverde.com/index.php?action=profile;u=19018
 
@@ -203,9 +276,9 @@ Send a text message to a thermostat's display screen.  The text message can be u
 
 ## License ##
 
-Copyright &copy; 2013-2014  John W. Cocula and others
+Copyright &copy; 2013-2015  John W. Cocula and others
 
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+Portions of this program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
@@ -244,11 +317,22 @@ See and submit more on [Github](https://github.com/watou/vera-ecobee/issues?page
 
 ## History ##
 
-### 2014-08-09    v1.1
+### 2015-06-09    v1.2
+
+Fixes and enhancements:
+
+* Point to official api.ecobee.com endpoints enhancement ([#11](https://github.com/watou/vera-ecobee/issues/11))
+* Repoint external icon references to http://watou.github.io/vera-ecobee/icons/*.png ([#12](https://github.com/watou/vera-ecobee/issues/12))
+* Map home/away buttons to set hold for named climates for non-EMS thermostats ([#13](https://github.com/watou/vera-ecobee/issues/13))
+* Add temperature, humidity and/or motion devices for remote sensors ([#14](https://github.com/watou/vera-ecobee/issues/14))
+* Change min poll frequency to 3 minutes per API docs ([#16](https://github.com/watou/vera-ecobee/issues/16))
+
+### 2015-05-29    v1.1
 
 Fixed:
 
 * Removed bad Vera version checking code so it works on UI7. ([#7](https://github.com/watou/vera-ecobee/issues/7))
+* Removed situation where when Vera loses our device variables, we try to refresh our tokens with stale tokens
 
 ### 2014-06-13    v1.0
 
