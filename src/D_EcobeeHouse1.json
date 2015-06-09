@@ -1,5 +1,5 @@
 {
-    "flashicon": "http://cocu.la/vera/ecobee/icons/house.png",
+    "flashicon": "http://watou.github.io/vera-ecobee/icons/house.png",
     "imgIconBody": "",
     "imgIconDimmable": "",
     "imgIconTurnable": "",
@@ -78,21 +78,21 @@
                         "text": "Home"
                     },
                     "Display": {
-                        "Service": "urn:upnp-org:serviceId:HouseStatus1",
-                        "Variable": "OccupancyState",
-                        "Value": "Occupied",
+                        "Service": "urn:ecobee-com:serviceId:Ecobee1",
+                        "Variable": "currentClimateRef",
+                        "Value": "home",
                         "Top": 60,
                         "Left": 145,
                         "Width": 75,
                         "Height": 20
                     },
                     "Command": {
-                        "Service": "urn:upnp-org:serviceId:HouseStatus1",
-                        "Action": "SetOccupancyState",
+                        "Service": "urn:ecobee-com:serviceId:Ecobee1",
+                        "Action": "SetClimateHold",
                         "Parameters": [
                             {
-                                "Name": "NewOccupancyState",
-                                "Value": "Occupied"
+                                "Name": "HoldClimateRef",
+                                "Value": "home"
                             }
                         ]
                     },
@@ -108,21 +108,21 @@
                         "text": "Away"
                     },
                     "Display": {
-                        "Service": "urn:upnp-org:serviceId:HouseStatus1",
-                        "Variable": "OccupancyState",
-                        "Value": "Unoccupied",
+                        "Service": "urn:ecobee-com:serviceId:Ecobee1",
+                        "Variable": "currentClimateRef",
+                        "Value": "away",
                         "Top": 60,
                         "Left": 50,
                         "Width": 75,
                         "Height": 20
                     },
                     "Command": {
-                        "Service": "urn:upnp-org:serviceId:HouseStatus1",
-                        "Action": "SetOccupancyState",
+                        "Service": "urn:ecobee-com:serviceId:Ecobee1",
+                        "Action": "SetClimateHold",
                         "Parameters": [
                             {
-                                "Name": "NewOccupancyState",
-                                "Value": "Unoccupied"
+                                "Name": "HoldClimateRef",
+                                "Value": "away"
                             }
                         ]
                     },
@@ -135,7 +135,7 @@
                     "left": "0",
                     "Label": {
                         "lang_tag": "event",
-                        "text": "Event"
+                        "text": "Event:"
                     },
                     "Display": {
                         "Top": 20,
@@ -165,7 +165,7 @@
                     "left": "1",
                     "Label": {
                         "lang_tag": "climate",
-                        "text": "Climate"
+                        "text": "Climate:"
                     },
                     "Display": {
                         "Top": 20,
@@ -225,28 +225,54 @@
         "group_1": {
             "cmd_1": {
                 "label": "HOME",
-                "serviceId": "urn:upnp-org:serviceId:HouseStatus1",
-                "action": "SetOccupancyState",
+                "serviceId": "urn:ecobee-com:serviceId:Ecobee1",
+                "action": "SetClimateHold",
                 "arguments": {
-                    "NewOccupancyState": "Occupied"
+                    "HoldClimateRef": "home"
                 },
                 "display": {
-                    "service": "urn:upnp-org:serviceId:HouseStatus1",
-                    "variable": "OccupancyState",
-                    "value": "Occupied"
+                    "service": "urn:ecobee-com:serviceId:Ecobee1",
+                    "variable": "currentClimateRef",
+                    "value": "home"
                 }
             },
             "cmd_2": {
                 "label": "AWAY",
-                "serviceId": "urn:upnp-org:serviceId:HouseStatus1",
-                "action": "SetOccupancyState",
+                "serviceId": "urn:ecobee-com:serviceId:Ecobee1",
+                "action": "SetClimateHold",
                 "arguments": {
-                    "NewOccupancyState": "Unoccupied"
+                    "HoldClimateRef": "away"
                 },
                 "display": {
-                    "service": "urn:upnp-org:serviceId:HouseStatus1",
-                    "variable": "OccupancyState",
-                    "value": "Unoccupied"
+                    "service": "urn:ecobee-com:serviceId:Ecobee1",
+                    "variable": "currentClimateRef",
+                    "value": "away"
+                }
+            },
+            "cmd_3": {
+                "label": "WAKEUP",
+                "serviceId": "urn:ecobee-com:serviceId:Ecobee1",
+                "action": "SetClimateHold",
+                "arguments": {
+                    "HoldClimateRef": "wakeup"
+                },
+                "display": {
+                    "service": "urn:ecobee-com:serviceId:Ecobee1",
+                    "variable": "currentClimateRef",
+                    "value": "wakeup"
+                }
+            },
+            "cmd_4": {
+                "label": "SLEEP",
+                "serviceId": "urn:ecobee-com:serviceId:Ecobee1",
+                "action": "SetClimateHold",
+                "arguments": {
+                    "HoldClimateRef": "sleep"
+                },
+                "display": {
+                    "service": "urn:ecobee-com:serviceId:Ecobee1",
+                    "variable": "currentClimateRef",
+                    "value": "sleep"
                 }
             }
         }
@@ -256,35 +282,49 @@
             "id": 1,
             "label": {
                 "lang_tag": "a_device_is_set_to_home_or_away",
-                "text": "A device is set to home or away"
+                "text": "A device is set to home, away, wakeup or sleep"
             },
-            "serviceId": "urn:upnp-org:serviceId:HouseStatus1",
+            "serviceId": "urn:ecobee-com:serviceId:Ecobee1",
             "argumentList": [
                 {
                     "id": 1,
                     "dataType": "string",
-                    "defaultValue": "Occupied",
+                    "defaultValue": "home",
                     "allowedValueList": [
                         {
-                            "Away": "Unoccupied",
+                            "Away": "away",
                             "HumanFriendlyText": {
                                 "lang_tag": "hft_device_set_to_away",
                                 "text": "_DEVICE_NAME_ is set to away"
                             }
                         },
                         {
-                            "Home": "Occupied",
+                            "Home": "home",
                             "HumanFriendlyText": {
                                 "lang_tag": "hft_device_set_to_home",
                                 "text": "_DEVICE_NAME_ is set to home"
                             }
+                        },
+                        {
+                            "Wakeup": "wakeup",
+                            "HumanFriendlyText": {
+                                "lang_tag": "hft_device_set_to_wakeup",
+                                "text": "_DEVICE_NAME_ is set to wakeup"
+                            }
+                        },
+                        {
+                            "Sleep": "sleep",
+                            "HumanFriendlyText": {
+                                "lang_tag": "hft_device_set_to_sleep",
+                                "text": "_DEVICE_NAME_ is set to sleep"
+                            }
                         }
                     ],
-                    "name": "OccupancyState",
+                    "name": "currentClimateRef",
                     "comparisson": "=",
                     "prefix": {
                         "lang_tag": "which_mode",
-                        "text": "Which mode"
+                        "text": "Which comfort setting"
                     },
                     "suffix": {}
                 }

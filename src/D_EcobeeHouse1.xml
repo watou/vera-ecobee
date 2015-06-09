@@ -16,11 +16,6 @@
     <staticJson>D_EcobeeHouse1.json</staticJson>
     <serviceList>
       <service>
-        <serviceType>urn:schemas-upnp-org:service:HouseStatus:1</serviceType>
-        <serviceId>urn:upnp-org:serviceId:HouseStatus1</serviceId>
-        <SCPDURL>S_HouseStatusEcobee1.xml</SCPDURL>
-      </service>
-      <service>
         <serviceType>urn:schemas-upnp-org:service:SwitchPower:1</serviceType>
         <serviceId>urn:upnp-org:serviceId:SwitchPower1</serviceId>
         <SCPDURL>S_SwitchPower1.xml</SCPDURL>

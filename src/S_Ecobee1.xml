@@ -5,6 +5,10 @@
     <minor>0</minor>
   </specVersion>
   <serviceStateTable>
+    <stateVariable>
+      <name>currentClimateRef</name>
+      <dataType>string</dataType>
+    </stateVariable>
   </serviceStateTable>
   <actionList>
     <action>
@@ -20,6 +24,15 @@
       <argumentList>
         <argument>
           <name>MessageText</name>
+          <direction>in</direction>
+        </argument>
+      </argumentList>
+    </action>
+    <action>
+      <name>SetClimateHold</name>
+      <argumentList>
+        <argument>
+          <name>HoldClimateRef</name>
           <direction>in</direction>
         </argument>
       </argumentList>
