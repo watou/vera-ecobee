@@ -266,7 +266,7 @@ Set a hold event to the setpoint and fan settings contained within a named clima
 
 ## Notes and Limitations ##
 
-* Works with Vera UI5 1.5.408 or later.    These days, it is only being tested on UI5 1.5.622.
+* Works with Vera UI5 1.5.408 or later.    These days, it is only being tested on UI5 1.5.622.  There are issues on UI7 whose solutions are either not possible or not documented.
 
 * Updates to the state of thermostat and humidistat devices can take up to the polling number of seconds (180 by default) to be reflected in the UPnP devices (or as quickly as 5 seconds).
 
@@ -317,11 +317,18 @@ See and submit more on [Github](https://github.com/watou/vera-ecobee/issues?page
 
 ## History ##
 
+### 2015-08-10    v1.3
+
+Fixed:
+
+* Triggers not firing for changes in currentClimateRef ([#17](https://github.com/watou/vera-ecobee/issues/17))
+* Auth token discarded too eagerly ([#18](https://github.com/watou/vera-ecobee/issues/18))
+
 ### 2015-06-09    v1.2
 
 Fixes and enhancements:
 
-* Point to official api.ecobee.com endpoints enhancement ([#11](https://github.com/watou/vera-ecobee/issues/11))
+* Point to official api.ecobee.com endpoints ([#11](https://github.com/watou/vera-ecobee/issues/11))
 * Repoint external icon references to http://watou.github.io/vera-ecobee/icons/*.png ([#12](https://github.com/watou/vera-ecobee/issues/12))
 * Map home/away buttons to set hold for named climates for non-EMS thermostats ([#13](https://github.com/watou/vera-ecobee/issues/13))
 * Add temperature, humidity and/or motion devices for remote sensors ([#14](https://github.com/watou/vera-ecobee/issues/14))
