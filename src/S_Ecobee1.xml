@@ -8,6 +8,7 @@
     <stateVariable>
       <name>currentClimateRef</name>
       <dataType>string</dataType>
+      <sendEventsAttribute>yes</sendEventsAttribute>
     </stateVariable>
   </serviceStateTable>
   <actionList>
