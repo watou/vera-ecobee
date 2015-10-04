@@ -80,6 +80,19 @@ _Please make sure that you specify the proper upper- and lowercase letters when 
 
 After you have entered the PIN in your My Apps widget at ecobee.com, on the next polling cycle the plugin will attempt to retrieve information about the thermostats that you specified in the selection criteria above.  The plugin will create a thermostat, humidistat and home/away switch device for each thermostat it discovers.  It will name each device as it is named in the thermostat itself, or if there is no name, it will name the device using the thermostat's unique identifier.  You can change this name in the Advanced tab of the device.
 
+
+## Controlling the Precision of Reported Temperatures ##
+
+The Ecobee thermostat internally reports temperatures in tenths of Fahrenheit degrees, but by default the plugin will report whole number degrees (regardless of whether Fahrenheit or Celsius temperature scales are used). You can control this, however, by specifying your preferred rounding precision with a device variable on the main Ecobee device called `TemperaturePrecision` (as of v1.4 of the plugin). The value you provide is the denominator D in the fraction 1/D, the fractional value to which the temperature should be rounded. For example, providing 2 means that temperatures will be rounded to the nearest 1/2 (0.5) of a degree. Providing 10 would round to the nearest tenth (0.10) of a degree.
+
+The default value for `TemperaturePrecision` is 1, meaning only whole degrees are reported by default.
+
+### Notes
+
+* This feature will not allow you to change the setpoint sliders in the user interface to fractional values; that is outside the scope of the plugin.
+* Using this feature may cause unwanted side-effects that are outside the scope of the plugin’s control. Please test your configuration thoroughly before determining that a non-1 value is for you.
+* This feature is agnostic to whether you display temperatures in Fahrenheit or Celsius, but it may be of more value to Celsius users to set `TemperaturePrecision` to 2 to achieve near-Fahrenheit granularity.
+
 ## UPnP Devices ##
 
 This plugin creates four different kinds of devices in Vera.  The ecobee device is the parent device of the other device types, and will create and delete them as they appear and disappear from your ecobee.com account.
