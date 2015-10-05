@@ -171,11 +171,13 @@ decompress_lzo_file() {
         (math.ceil(value * precision - 0.5) / precision)
     end
 
+    local TemperaturePrecision = 1
+
     -- convert thermostat format (F*10) to local format (C or F)
     local function localizeTemp(temperature)
       temperature = temperature or -5002
-      return (veraTemperatureScale == "F") and round(temperature/10, 1) or
-             round(((temperature/10 + 0.0) - 32.0) / 1.8, 1)
+      return (veraTemperatureScale == "F") and round(temperature/10, TemperaturePrecision) or
+             round(((temperature/10 + 0.0) - 32.0) / 1.8, TemperaturePrecision)
     end
 
     -- convert local format (C or F) to thermostat format (F*10)
@@ -934,6 +936,12 @@ decompress_lzo_file() {
       PARENT_DEVICE = lul_device
 
       -- ecobeeLog = io.open("/tmp/ecobee." .. tostring(lul_device) .. ".log", "a")
+
+      TemperaturePrecision = tonumber(readVariableOrInit(PARENT_DEVICE, ECOBEE_SID, "TemperaturePrecision", "1"))
+      TemperaturePrecision = TemperaturePrecision or 1
+      if TemperaturePrecision &lt; 1 or TemperaturePrecision &gt; 1000 then
+        TemperaturePrecision = 1
+      end
 
       getVeraTemperatureScale()
 
