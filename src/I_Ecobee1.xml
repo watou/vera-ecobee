@@ -194,12 +194,26 @@ decompress_lzo_file() {
       return os.time{year=year, month=month, day=day, hour=hour, min=min, sec=sec} + offset
     end
 
+    -- find the event that is considered the current event and return it
+    local function getCurrentEvent(events)
+      if not events then return nil end
+      for i=1,#events do
+        if events[i].running then
+          return events[i]
+        end
+      end
+      return nil
+    end
+
     -- the plugin defines the current climate as either the climate used for the current hold,
     -- or if there is no current hold, the current program's climate.  If there is a current hold
     -- but it's not based on a climate, then the current climate is the empty string ""
     local function getCurrentClimateRef(t)
-      local climate = (t.events and #t.events > 0 and t.events[1].holdClimateRef) or 
-                      (t.program and t.program.currentClimateRef)
+      local climate = t.program and t.program.currentClimateRef
+      local event = getCurrentEvent(t.events)
+      if event then
+        climate = event.holdClimateRef
+      end
       return climate or ""
     end
 
@@ -219,7 +233,8 @@ decompress_lzo_file() {
         ["quickSaveSetBack"] = function(t) return tostring(t.settings.quickSaveSetBack) end,
         ["quickSaveSetForward"] = function(t) return tostring(t.settings.quickSaveSetForward) end,
         ["currentEventType"] = function(t)
-          return (t.events and #t.events > 0 and t.events[1]["type"]) and t.events[1]["type"] or "none"
+          local event = getCurrentEvent(t.events)
+          return (event and event["type"]) and event["type"] or "none"
         end,
         ["currentClimateRef"] = function(t) return getCurrentClimateRef(t) end,
         ["StreetAddress"] = function(t) return t.location.streetAddress end,
