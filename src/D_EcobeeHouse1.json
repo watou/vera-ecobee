@@ -1,17 +1,38 @@
 {
     "flashicon": "http://watou.github.io/vera-ecobee/icons/house.png",
+    "default_icon": "http://watou.github.io/vera-ecobee/icons/house.png",
     "imgIconBody": "",
     "imgIconDimmable": "",
     "imgIconTurnable": "",
     "imgIconMin": "",
     "imgIconMax": "",
     "halloIconsDir": "pics/hallo",
-    "state_icons": [
-        "house_0.png",
-        "house_100.png"
-    ],
     "x": "2",
     "y": "4",
+    "state_icons": [
+        {
+            "img": "http://watou.github.io/vera-ecobee/icons/house_0.png",
+            "conditions": [
+                {
+                    "service": "urn:upnp-org:serviceId:SwitchPower1",
+                    "variable": "Status",
+                    "operator": "==",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "img": "http://watou.github.io/vera-ecobee/icons/house_100.png",
+            "conditions": [
+                {
+                    "service": "urn:upnp-org:serviceId:SwitchPower1",
+                    "variable": "Status",
+                    "operator": "==",
+                    "value": "1"
+                }
+            ]
+        }
+    ],
     "inScene": "1",
     "DisplayStatus": {
         "Service": "urn:upnp-org:serviceId:SwitchPower1",
@@ -250,16 +271,16 @@
                 }
             },
             "cmd_3": {
-                "label": "WAKEUP",
+            "label": "VACATION",
                 "serviceId": "urn:ecobee-com:serviceId:Ecobee1",
                 "action": "SetClimateHold",
                 "arguments": {
-                    "HoldClimateRef": "wakeup"
+                    "HoldClimateRef": "smart1"
                 },
                 "display": {
                     "service": "urn:ecobee-com:serviceId:Ecobee1",
                     "variable": "currentClimateRef",
-                    "value": "wakeup"
+                    "value": "smart1"
                 }
             },
             "cmd_4": {
