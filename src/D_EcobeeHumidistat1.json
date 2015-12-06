@@ -1,5 +1,6 @@
 {
     "flashicon": "icons/Humidity_Sensor.swf",
+    "default_icon": "humidity_sensor_default.png",
     "iconText": "1",
     "imgIconBody": "",
     "imgIconDimmable": "",
