@@ -1,5 +1,6 @@
 {
     "flashicon": "http://watou.github.io/vera-ecobee/icons/ecobee.png",
+    "default_icon": "http://watou.github.io/vera-ecobee/icons/ecobee.png",
     "imgIconBody": "",
     "imgIconDimmable": "",
     "imgIconTurnable": "",
@@ -7,9 +8,30 @@
     "imgIconMax": "",
     "halloIconsDir": "pics/hallo",
     "state_icons": [
-        "ecobee_0.png",
-        "ecobee_100.png"
-    ],
+
+ 	{
+            "img": "http://watou.github.io/vera-ecobee/icons/ecobee_0.png",
+            "conditions": [
+                {
+                    "service": "urn:ecobee-com:serviceId:Ecobee1",
+                    "variable": "status",
+                    "operator": "==",
+                    "value": "0",
+                }
+            ]
+        },
+        {
+            "img": "http://watou.github.io/vera-ecobee/icons/ecobee_100.png",
+            "conditions": [
+                {
+                    "service": "urn:ecobee-com:serviceId:Ecobee1",
+                    "variable": "status",
+                    "operator": "==",
+                    "value": "1",
+                }
+            ]
+        }
+   ],
     "x": "2",
     "y": "4",
     "inScene": "0",
