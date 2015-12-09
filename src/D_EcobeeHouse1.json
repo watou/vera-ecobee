@@ -149,6 +149,66 @@
                     },
                     "ControlCode": "im_away"
                 },
+{
+                    "ControlGroup": "1",
+                    "ControlType": "button",
+                    "top": "0",
+                    "left": "1",
+                    "Label": {
+                        "lang_tag": "cmd_sleep",
+                        "text": "Sleep"
+                    },
+                    "Display": {
+                        "Service": "urn:ecobee-com:serviceId:Ecobee1",
+                        "Variable": "currentClimateRef",
+                        "Value": "sleep",
+                        "Top": 60,
+                        "Left": 50,
+                        "Width": 75,
+                        "Height": 20
+                    },
+                    "Command": {
+                        "Service": "urn:ecobee-com:serviceId:Ecobee1",
+                        "Action": "SetClimateHold",
+                        "Parameters": [
+                            {
+                                "Name": "HoldClimateRef",
+                                "Value": "sleep"
+                            }
+                        ]
+                    },
+                    "ControlCode": "im_home"
+                },
+{
+                    "ControlGroup": "2",
+                    "ControlType": "button",
+                    "top": "0",
+                    "left": "1",
+                    "Label": {
+                        "lang_tag": "cmd_smart1",
+                        "text": "Vacation"
+                    },
+                    "Display": {
+                        "Service": "urn:ecobee-com:serviceId:Ecobee1",
+                        "Variable": "currentClimateRef",
+                        "Value": "smart1",
+                        "Top": 60,
+                        "Left": 145,
+                        "Width": 75,
+                        "Height": 20
+                    },
+                    "Command": {
+                        "Service": "urn:ecobee-com:serviceId:Ecobee1",
+                        "Action": "SetClimateHold",
+                        "Parameters": [
+                            {
+                                "Name": "HoldClimateRef",
+                                "Value": "smart1"
+                            }
+                        ]
+                    },
+                    "ControlCode": "im_away"
+                },
                 {
                     "ControlGroup": "3",
                     "ControlType": "label",
@@ -271,20 +331,7 @@
                 }
             },
             "cmd_3": {
-            "label": "VACATION",
-                "serviceId": "urn:ecobee-com:serviceId:Ecobee1",
-                "action": "SetClimateHold",
-                "arguments": {
-                    "HoldClimateRef": "smart1"
-                },
-                "display": {
-                    "service": "urn:ecobee-com:serviceId:Ecobee1",
-                    "variable": "currentClimateRef",
-                    "value": "smart1"
-                }
-            },
-            "cmd_4": {
-                "label": "SLEEP",
+            "label": "SLEEP",
                 "serviceId": "urn:ecobee-com:serviceId:Ecobee1",
                 "action": "SetClimateHold",
                 "arguments": {
@@ -294,6 +341,19 @@
                     "service": "urn:ecobee-com:serviceId:Ecobee1",
                     "variable": "currentClimateRef",
                     "value": "sleep"
+                }
+            },
+            "cmd_4": {
+                "label": "VACATION",
+                "serviceId": "urn:ecobee-com:serviceId:Ecobee1",
+                "action": "SetClimateHold",
+                "arguments": {
+                    "HoldClimateRef": "smart1"
+                },
+                "display": {
+                    "service": "urn:ecobee-com:serviceId:Ecobee1",
+                    "variable": "currentClimateRef",
+                    "value": "smart1"
                 }
             }
         }
@@ -327,17 +387,17 @@
                             }
                         },
                         {
-                            "Wakeup": "wakeup",
-                            "HumanFriendlyText": {
-                                "lang_tag": "hft_device_set_to_wakeup",
-                                "text": "_DEVICE_NAME_ is set to wakeup"
-                            }
-                        },
-                        {
                             "Sleep": "sleep",
                             "HumanFriendlyText": {
                                 "lang_tag": "hft_device_set_to_sleep",
                                 "text": "_DEVICE_NAME_ is set to sleep"
+                            }
+                        },
+                        {
+                            "Vacation": "vacation",
+                            "HumanFriendlyText": {
+                                "lang_tag": "hft_device_set_to_vacation",
+                                "text": "_DEVICE_NAME_ is set to vacation"
                             }
                         }
                     ],
