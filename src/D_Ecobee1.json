@@ -133,8 +133,7 @@
                         "Parameters": []
                     },
                     "ControlCode": "get_pin"
-                },
-
+                }
             ]
         },
         {
