@@ -16,7 +16,7 @@
                     "service": "urn:ecobee-com:serviceId:Ecobee1",
                     "variable": "status",
                     "operator": "==",
-                    "value": "0",
+                    "value": "0"
                 }
             ]
         },
@@ -27,7 +27,7 @@
                     "service": "urn:ecobee-com:serviceId:Ecobee1",
                     "variable": "status",
                     "operator": "==",
-                    "value": "1",
+                    "value": "1"
                 }
             ]
         }
