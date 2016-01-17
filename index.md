@@ -334,10 +334,10 @@ See and submit more on [Github](https://github.com/watou/vera-ecobee/issues?page
 
 Fixes and enhancements:
 
-* Let user choose precision of reported temperatures enhancement ([#19](https://github.com/watou/vera-ecobee/issues/19))
-* Recognize only the currently running event for currentClimateRef/currentEventType bug ([#20](https://github.com/watou/vera-ecobee/issues/20))
-* Token issue with ecobee API bug #21 ([#21](https://github.com/watou/vera-ecobee/issues/21))
-* Added humidity mode state to humidistat device enhancement ([#22](22))
+* Let user choose precision of reported temperatures ([#19](https://github.com/watou/vera-ecobee/issues/19))
+* Recognize only the currently running event for currentClimateRef/currentEventType ([#20](https://github.com/watou/vera-ecobee/issues/20))
+* Token issue with ecobee API #21 ([#21](https://github.com/watou/vera-ecobee/issues/21))
+* Added humidity mode state to humidistat device ([#22](22))
 
 ### 2015-08-10    v1.3
 
