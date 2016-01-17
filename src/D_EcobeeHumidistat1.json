@@ -40,10 +40,10 @@
             "SceneGroup": [
                 {
                     "id": "1",
-                    "top": "1.5",
+                    "top": "0.5",
                     "left": "0.25",
                     "x": "1.5",
-                    "y": "2"
+                    "y": "3"
                 }
             ],
             "Control": [
@@ -73,6 +73,20 @@
                         "Variable": "CurrentLevel",
                         "Top": 60,
                         "Left": 145,
+                        "Width": 75,
+                        "Height": 20
+                    }
+                },
+                {
+                    "ControlGroup": "1",
+                    "ControlType": "variable",
+                    "top": "2",
+                    "left": "0",
+                    "Display": {
+                        "Service": "urn:ecobee-com:serviceId:Ecobee1",
+                        "Variable": "HumidityModeState",
+                        "Top": 80,
+                        "Left": 50,
                         "Width": 75,
                         "Height": 20
                     }
@@ -174,6 +188,52 @@
                         "lang_tag": "hft_humidity_goes_below",
                         "text": "Humidity reported by _DEVICE_NAME_ goes below _ARGUMENT_VALUE_"
                     }
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "label": {
+                "lang_tag": "humidity_mode_state_changes",
+                "text": "Humidistat Running State Changes"
+            },
+            "serviceId": "urn:ecobee-com:serviceId:Ecobee1",
+            "argumentList": [
+                {
+                    "id": 1,
+                    "dataType": "string",
+                    "defaultValue": "",
+                    "allowedValueList": [
+                        {
+                            "Humidifying": "Humidifying",
+                            "HumanFriendlyText": {
+                                "lang_tag": "hft_hum_humidifying",
+                                "text": "_DEVICE_NAME_ is humidifying"
+                            }
+                        },
+                        {
+                            "Dehumidifying": "Dehumidifying",
+                            "HumanFriendlyText": {
+                                "lang_tag": "hft_hum_dehumidifying",
+                                "text": "_DEVICE_NAME_ is dehumidifying"
+                            }
+                        },
+                        {
+                            "Idle": "Idle",
+                            "HumanFriendlyText": {
+                                "lang_tag": "hft_hum_idle",
+                                "text": "_DEVICE_NAME_ is idle"
+                            }
+                        }
+
+                    ],
+                    "name": "HumidityModeState",
+                    "comparisson": "=",
+                    "prefix": {
+                        "lang_tag": "hum_mode_state",
+                        "text": "HumidityModeState"
+                    },
+                    "suffix": {}
                 }
             ]
         }

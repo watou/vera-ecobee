@@ -104,7 +104,7 @@ decompress_lzo_file() {
     end
 
     -- constants
-    local PLUGIN_VERSION = "1.3"
+    local PLUGIN_VERSION = "1.4"
     local ECOBEE_SID = "urn:ecobee-com:serviceId:Ecobee1"
     local TEMP_SENSOR_SID = "urn:upnp-org:serviceId:TemperatureSensor1"
     local TEMP_SETPOINT_HEAT_SID = "urn:upnp-org:serviceId:TemperatureSetpoint1_Heat"
@@ -243,7 +243,14 @@ decompress_lzo_file() {
         ["Country"] = function(t) return t.location.country end,
         ["PostalCode"] = function(t) return t.location.postalCode end,
         ["PhoneNumber"] = function(t) return t.location.phoneNumber end,
-        ["MapCoordinates"] = function(t) return t.location.mapCoordinates end
+        ["MapCoordinates"] = function(t) return t.location.mapCoordinates end,
+        ["HumidityModeState"] = function(t)
+          -- return "Humidifying", "Dehumidifying", "Idle" from list of humidifier, dehumidifier
+          if (string.find(t.equipmentStatus, "dehumid"))    then return "Dehumidifying"
+          elseif (string.find(t.equipmentStatus, "humid"))  then return "Humidifying"
+          else return "Idle"
+          end
+        end
       },
       [SWITCH_POWER_SID] = {
         ["Status"] = function(t) return isHome(t) and "1" or "0" end
@@ -398,10 +405,6 @@ decompress_lzo_file() {
       return UPNP_TO_ECOBEE[serviceId][actionName][variableName](lul_settings)
     end
 
-    local ecobeeLog
-
-    local auth_token_failures = 0
-
     local function loadSession()
       local session = {}
 
@@ -418,8 +421,6 @@ decompress_lzo_file() {
       session.auth_token    = luup.variable_get(ECOBEE_SID, "auth_token",    PARENT_DEVICE)
       if session.auth_token == "" then session.auth_token = nil end
 
-      session.auth_token_failures = auth_token_failures
-
       session.access_token  = luup.variable_get(ECOBEE_SID, "access_token",  PARENT_DEVICE)
       if session.access_token == "" then session.access_token = nil end
 
@@ -428,8 +429,6 @@ decompress_lzo_file() {
 
       session.refresh_token = luup.variable_get(ECOBEE_SID, "refresh_token", PARENT_DEVICE)
       if session.refresh_token == "" then session.refresh_token = nil end
-
-      session.log = ecobeeLog
 
       return session
     end
@@ -440,7 +439,6 @@ decompress_lzo_file() {
       end
 
       writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "auth_token",    session.auth_token or "")
-      auth_token_failures = session.auth_token_failures or 0
       writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "access_token",  session.access_token or "")
       writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "token_type",    session.token_type or "")
       writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "refresh_token", session.refresh_token or "")
@@ -595,6 +593,7 @@ decompress_lzo_file() {
               luup.chdev.append(PARENT_DEVICE, ptr, altid, name, "urn:schemas-ecobee-com:device:EcobeeHumidistat:1",
                                 "D_EcobeeHumidistat1.xml", "",
                                 ecobeeToUpnpParam(HUMIDITY_SENSOR_SID, "CurrentLevel", t) ..
+                        "\n" .. ecobeeToUpnpParam(ECOBEE_SID, "HumidityModeState", t) ..
                         "\n" .. ecobeeToUpnpParam(HA_DEVICE_SID, "LastUpdate", t) ..
                         "\n" .. ecobeeToUpnpParam(HA_DEVICE_SID, "CommFailure", r)
                                 , false, false)
@@ -725,6 +724,7 @@ decompress_lzo_file() {
                     luup.attr_set("category_num", "16", child)
                   end
                   writeVariableFromEcobeeIfChanged(child, HUMIDITY_SENSOR_SID, "CurrentLevel", t)
+                  writeVariableFromEcobeeIfChanged(child, ECOBEE_SID, "HumidityModeState", t)
                   writeVariableFromEcobeeIfChanged(child, HA_DEVICE_SID, "LastUpdate", t)
                   writeVariableFromEcobeeIfChanged(child, HA_DEVICE_SID, "CommFailure", r)
                 end
@@ -949,8 +949,6 @@ decompress_lzo_file() {
       log("plugin version " .. PLUGIN_VERSION .. " starting up...", 50)
 
       PARENT_DEVICE = lul_device
-
-      -- ecobeeLog = io.open("/tmp/ecobee." .. tostring(lul_device) .. ".log", "a")
 
       TemperaturePrecision = tonumber(readVariableOrInit(PARENT_DEVICE, ECOBEE_SID, "TemperaturePrecision", "1"))
       TemperaturePrecision = TemperaturePrecision or 1
