@@ -104,7 +104,7 @@ decompress_lzo_file() {
     end
 
     -- constants
-    local PLUGIN_VERSION = "1.4"
+    local PLUGIN_VERSION = "1.5"
     local ECOBEE_SID = "urn:ecobee-com:serviceId:Ecobee1"
     local TEMP_SENSOR_SID = "urn:upnp-org:serviceId:TemperatureSensor1"
     local TEMP_SETPOINT_HEAT_SID = "urn:upnp-org:serviceId:TemperatureSetpoint1_Heat"
@@ -405,6 +405,8 @@ decompress_lzo_file() {
       return UPNP_TO_ECOBEE[serviceId][actionName][variableName](lul_settings)
     end
 
+    local auth_token_failures = 0
+
     local function loadSession()
       local session = {}
 
@@ -420,6 +422,8 @@ decompress_lzo_file() {
       -- Session variables
       session.auth_token    = luup.variable_get(ECOBEE_SID, "auth_token",    PARENT_DEVICE)
       if session.auth_token == "" then session.auth_token = nil end
+
+      session.auth_token_failures = auth_token_failures
 
       session.access_token  = luup.variable_get(ECOBEE_SID, "access_token",  PARENT_DEVICE)
       if session.access_token == "" then session.access_token = nil end
@@ -439,6 +443,7 @@ decompress_lzo_file() {
       end
 
       writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "auth_token",    session.auth_token or "")
+      auth_token_failures = session.auth_token_failures or 0
       writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "access_token",  session.access_token or "")
       writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "token_type",    session.token_type or "")
       writeVariableIfChanged(PARENT_DEVICE, ECOBEE_SID, "refresh_token", session.refresh_token or "")
