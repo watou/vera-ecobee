@@ -330,6 +330,12 @@ See and submit more on [Github](https://github.com/watou/vera-ecobee/issues?page
 
 ## History ##
 
+### 2016-02-19    v1.5
+
+Fixes:
+
+* Auth tokens are still prematurely discarded ([#23](https://github.com/watou/vera-ecobee/issues/23))
+
 ### 2016-01-17    v1.4
 
 Fixes and enhancements:
