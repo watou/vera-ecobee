@@ -40,6 +40,11 @@
         <SCPDURL>S_TemperatureSetpoint1.xml</SCPDURL>
       </service>
       <service>
+        <serviceType>urn:schemas-upnp-org:service:TemperatureSetpoint:1</serviceType>
+        <serviceId>urn:upnp-org:serviceId:TemperatureSetpoint1</serviceId>
+        <SCPDURL>S_TemperatureSetpoint1.xml</SCPDURL>
+      </service>
+      <service>
         <serviceType>urn:schemas-micasaverde-com:service:EnergyMetering:1</serviceType>
         <serviceId>urn:micasaverde-com:serviceId:EnergyMetering1</serviceId>
         <SCPDURL>S_EnergyMetering1.xml</SCPDURL>

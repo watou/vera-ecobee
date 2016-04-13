@@ -2,7 +2,7 @@
 <!-- 
  MiOS (Vera) Plugin for ecobee Thermostats
 
- Copyright (C) 2013-2015  John W. Cocula and others
+ Copyright (C) 2013-2016  John W. Cocula and others
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -104,11 +104,12 @@ decompress_lzo_file() {
     end
 
     -- constants
-    local PLUGIN_VERSION = "1.5"
+    local PLUGIN_VERSION = "1.6"
     local ECOBEE_SID = "urn:ecobee-com:serviceId:Ecobee1"
     local TEMP_SENSOR_SID = "urn:upnp-org:serviceId:TemperatureSensor1"
     local TEMP_SETPOINT_HEAT_SID = "urn:upnp-org:serviceId:TemperatureSetpoint1_Heat"
     local TEMP_SETPOINT_COOL_SID = "urn:upnp-org:serviceId:TemperatureSetpoint1_Cool"
+    local TEMP_SETPOINT_SID = "urn:upnp-org:serviceId:TemperatureSetpoint1"
     local HUMIDITY_SENSOR_SID = "urn:micasaverde-com:serviceId:HumiditySensor1"
     local HVAC_FAN_SID = "urn:upnp-org:serviceId:HVAC_FanOperatingMode1"
     local HVAC_USER_SID = "urn:upnp-org:serviceId:HVAC_UserOperatingMode1"
@@ -232,6 +233,7 @@ decompress_lzo_file() {
         ["equipmentStatus"] = function(r) return r.equipmentStatus or "unknown" end,
         ["quickSaveSetBack"] = function(t) return tostring(t.settings.quickSaveSetBack) end,
         ["quickSaveSetForward"] = function(t) return tostring(t.settings.quickSaveSetForward) end,
+        ["holdType"] = function(t) return "indefinite" end, -- default value on device creation
         ["currentEventType"] = function(t)
           local event = getCurrentEvent(t.events)
           return (event and event["type"]) and event["type"] or "none"
@@ -266,6 +268,14 @@ decompress_lzo_file() {
       [TEMP_SETPOINT_COOL_SID] = {
         ["Application"] = function() return "Cooling" end,
         ["CurrentSetpoint"] = function(t) return tostring(localizeTemp(t.runtime.desiredCool)) end
+      },
+      [TEMP_SETPOINT_SID] = {
+        ["Application"] = function() return "DualHeatingCooling" end,
+        ["CurrentSetpoint"] = function(t)
+          local desiredTemp = (t.settings.hvacMode == "heat") and t.runtime.desiredHeat or 
+                              ((t.settings.hvacMode == "cool") and t.runtime.desiredCool or ((t.runtime.desiredHeat + t.runtime.desiredCool) / 2))
+          return tostring(localizeTemp(desiredTemp))
+        end
       },
       [HUMIDITY_SENSOR_SID] = {
         ["CurrentLevel"] = function(t, cap) return (not cap) and tostring(t.runtime.actualHumidity) or (cap.value == "unknown" and "0" or cap.value) end
@@ -372,6 +382,13 @@ decompress_lzo_file() {
         }
       },
       [TEMP_SETPOINT_COOL_SID] = {
+        ["SetCurrentSetpoint"] = {
+          ["NewCurrentSetpoint"] = function(lul_settings)
+            return delocalizeTemp(lul_settings.NewCurrentSetpoint)
+          end
+        }
+      },
+      [TEMP_SETPOINT_SID] = {
         ["SetCurrentSetpoint"] = {
           ["NewCurrentSetpoint"] = function(lul_settings)
             return delocalizeTemp(lul_settings.NewCurrentSetpoint)
@@ -581,9 +598,11 @@ decompress_lzo_file() {
                         "\n" .. ecobeeToUpnpParam(ECOBEE_SID, "equipmentStatus", r) ..
                         "\n" .. ecobeeToUpnpParam(ECOBEE_SID, "quickSaveSetBack", t) .. 
                         "\n" .. ecobeeToUpnpParam(ECOBEE_SID, "quickSaveSetForward", t) .. 
+                        "\n" .. ecobeeToUpnpParam(ECOBEE_SID, "holdType", t) .. 
                         "\n" .. ecobeeToUpnpParam(TEMP_SENSOR_SID, "CurrentTemperature", t) ..
                         "\n" .. ecobeeToUpnpParam(TEMP_SETPOINT_HEAT_SID, "CurrentSetpoint", t) ..
                         "\n" .. ecobeeToUpnpParam(TEMP_SETPOINT_COOL_SID, "CurrentSetpoint", t) ..
+                        "\n" .. ecobeeToUpnpParam(TEMP_SETPOINT_SID, "CurrentSetpoint", t) ..
                         "\n" .. ecobeeToUpnpParam(HVAC_FAN_SID, "Mode", t) ..
                         "\n" .. ecobeeToUpnpParam(HVAC_FAN_SID, "FanStatus", t) ..
                         "\n" .. ecobeeToUpnpParam(HVAC_USER_SID, "ModeStatus", t) ..
@@ -707,9 +726,11 @@ decompress_lzo_file() {
                   writeVariableFromEcobeeIfChanged(child, ECOBEE_SID, "equipmentStatus", r)
                   writeVariableFromEcobeeIfChanged(child, ECOBEE_SID, "quickSaveSetBack", t)
                   writeVariableFromEcobeeIfChanged(child, ECOBEE_SID, "quickSaveSetForward", t)
+                  readVariableOrInit(child, ECOBEE_SID, "holdType", "indefinite") -- create device variable if doesn't exist
                   writeVariableFromEcobeeIfChanged(child, TEMP_SENSOR_SID, "CurrentTemperature", t)
                   writeVariableFromEcobeeIfChanged(child, TEMP_SETPOINT_HEAT_SID, "CurrentSetpoint", t)
                   writeVariableFromEcobeeIfChanged(child, TEMP_SETPOINT_COOL_SID, "CurrentSetpoint", t)
+                  writeVariableFromEcobeeIfChanged(child, TEMP_SETPOINT_SID, "CurrentSetpoint", t)
                   writeVariableFromEcobeeIfChanged(child, HVAC_FAN_SID, "Mode", t)
                   writeVariableFromEcobeeIfChanged(child, HVAC_FAN_SID, "FanStatus", t)
                   writeVariableFromEcobeeIfChanged(child, HVAC_USER_SID, "ModeStatus", t)
@@ -819,6 +840,9 @@ decompress_lzo_file() {
         return false
       end
 
+      -- determine which type of hold to set
+      func.params.holdType = readVariableOrInit(lul_device, ECOBEE_SID, "holdType", "indefinite")
+
       -- if selection is nil, we will make our own.
       selection = selection or getSelection(session, lul_device)
 
@@ -852,7 +876,7 @@ decompress_lzo_file() {
     end
 
     local function setClimateHold(session, selection, lul_device, holdClimateRef)
-      local func = ecobee.setHoldFunction(nil, nil, "indefinite")
+      local func = ecobee.setHoldFunction()
       func.params.holdClimateRef = holdClimateRef
       return setHold(session, selection, lul_device, func)
     end
@@ -876,7 +900,7 @@ decompress_lzo_file() {
       local quickSaveSetForward = luup.variable_get(ECOBEE_SID, "quickSaveSetForward", lul_device)
       quickSaveSetForward = tonumber(quickSaveSetForward) or 40 -- TODO
 
-      local func = ecobee.setHoldFunction(nil, nil, "indefinite")
+      local func = ecobee.setHoldFunction()
       func.params.coolRelativeTemp = quickSaveSetForward
       func.params.heatRelativeTemp = quickSaveSetBack
       func.params.isTemperatureRelative = false
@@ -1070,7 +1094,7 @@ decompress_lzo_file() {
       <run>
         local heatHoldTemp = upnpToEcobee(TEMP_SETPOINT_HEAT_SID, "SetCurrentSetpoint", "NewCurrentSetpoint", lul_settings)
         local session = loadSession()
-        local func = ecobee.setHoldFunction(nil, heatHoldTemp, "indefinite")
+        local func = ecobee.setHoldFunction(nil, heatHoldTemp)
         if not setHold(session, nil, lul_device, func) then
           task("Failed to set heat temperature setpoint.")
         end
@@ -1096,7 +1120,7 @@ decompress_lzo_file() {
       <run>
         local coolHoldTemp = upnpToEcobee(TEMP_SETPOINT_COOL_SID, "SetCurrentSetpoint", "NewCurrentSetpoint", lul_settings)
         local session = loadSession()
-        local func = ecobee.setHoldFunction(coolHoldTemp, nil, "indefinite")
+        local func = ecobee.setHoldFunction(coolHoldTemp, nil)
         if not setHold(session, nil, lul_device, func) then
           task("Failed to set cool temperature setpoint.")
         end
@@ -1107,6 +1131,35 @@ decompress_lzo_file() {
       <name>GetCurrentSetpoint</name>
       <run>
         return luup.variable_get(TEMP_SETPOINT_COOL_SID, "CurrentSetpoint", lul_device)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:TemperatureSetpoint1</serviceId>
+      <name>GetApplication</name>
+      <run>
+        return ecobeeToUpnp(TEMP_SETPOINT_SID, "Application")
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:TemperatureSetpoint1</serviceId>
+      <name>SetCurrentSetpoint</name>
+      <run>
+        local holdTemp = upnpToEcobee(TEMP_SETPOINT_SID, "SetCurrentSetpoint", "NewCurrentSetpoint", lul_settings)
+        local modeStatus = luup.variable_get(HVAC_USER_SID, "ModeStatus", lul_device) or "AutoChangeOver"
+        local heatHoldTemp = (modeStatus ~= "CoolOn") and holdTemp or nil
+        local coolHoldTemp = (modeStatus ~= "HeatOn") and holdTemp or nil
+        local session = loadSession()
+        local func = ecobee.setHoldFunction(coolHoldTemp, heatHoldTemp)
+        if not setHold(session, nil, lul_device, func) then
+          task("Failed to set temperature setpoint.")
+        end
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:TemperatureSetpoint1</serviceId>
+      <name>GetCurrentSetpoint</name>
+      <run>
+        return luup.variable_get(TEMP_SETPOINT_SID, "CurrentSetpoint", lul_device)
       </run>
     </action>
     <action>
@@ -1145,7 +1198,7 @@ decompress_lzo_file() {
       <name>SetMode</name>
       <run>
         local session = loadSession()
-        local func = ecobee.setHoldFunction(nil, nil, "indefinite")
+        local func = ecobee.setHoldFunction()
         func.params.fan = upnpToEcobee(HVAC_FAN_SID, "SetMode", "NewMode", lul_settings)
         if not setHold(session, nil, lul_device, func) then
           task("Failed to set fan mode to " .. tostring(mode))
