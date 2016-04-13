@@ -330,6 +330,14 @@ See and submit more on [Github](https://github.com/watou/vera-ecobee/issues?page
 
 ## History ##
 
+### 2016-04-13    v1.6
+
+Fixes and enhancements:
+
+* Add holdType variable to each thermostat ([#24](https://github.com/watou/vera-ecobee/issues/24))
+* Adjust to OAuth2 changes ([#25](https://github.com/watou/vera-ecobee/issues/25))
+* Add temperature setpoint for UI7 ([#26](https://github.com/watou/vera-ecobee/issues/26))
+
 ### 2016-02-19    v1.5
 
 Fixes:
@@ -343,7 +351,7 @@ Fixes and enhancements:
 * Let user choose precision of reported temperatures ([#19](https://github.com/watou/vera-ecobee/issues/19))
 * Recognize only the currently running event for currentClimateRef/currentEventType ([#20](https://github.com/watou/vera-ecobee/issues/20))
 * Token issue with ecobee API #21 ([#21](https://github.com/watou/vera-ecobee/issues/21))
-* Added humidity mode state to humidistat device ([#22](22))
+* Added humidity mode state to humidistat device ([#22](https://github.com/watou/vera-ecobee/issues/22))
 
 ### 2015-08-10    v1.3
 
