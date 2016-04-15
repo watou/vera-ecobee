@@ -15,6 +15,12 @@
       <dataType>string</dataType>
       <sendEventsAttribute>yes</sendEventsAttribute>
     </stateVariable>
+    <stateVariable>
+      <name>FanMinOnTime</name>
+      <dataType>i4</dataType>
+      <defaultValue>0</defaultValue>
+      <sendEventsAttribute>yes</sendEventsAttribute>
+    </stateVariable>
   </serviceStateTable>
   <actionList>
     <action>
@@ -40,6 +46,16 @@
         <argument>
           <name>HoldClimateRef</name>
           <direction>in</direction>
+        </argument>
+      </argumentList>
+    </action>
+    <action>
+      <name>SetFanMinOnTime</name>
+      <argumentList>
+        <argument>
+          <name>MinOnTime</name>
+          <direction>in</direction>
+          <relatedStateVariable>FanMinOnTime</relatedStateVariable>
         </argument>
       </argumentList>
     </action>

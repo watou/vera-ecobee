@@ -1221,6 +1221,15 @@ decompress_lzo_file() {
     </action>
     <action>
       <serviceId>urn:ecobee-com:serviceId:Ecobee1</serviceId>
+      <name>SetFanMinOnTime</name>
+      <run>
+        local session = loadSession()
+        local selection = getSelection(session, lul_device)
+        return updateThermostats(session, ecobee.thermostatsUpdateOptions(selection, nil, { settings = { fanMinOnTime = lul_settings.MinOnTime } }));
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:ecobee-com:serviceId:Ecobee1</serviceId>
       <name>ResumeProgram</name>
       <run>
         local session = loadSession()
