@@ -16,7 +16,17 @@
       <sendEventsAttribute>yes</sendEventsAttribute>
     </stateVariable>
     <stateVariable>
-      <name>FanMinOnTime</name>
+      <name>MessageTextVar</name>
+      <dataType>string</dataType>
+      <sendEventsAttribute>yes</sendEventsAttribute>
+    </stateVariable>
+    <stateVariable>
+      <name>HoldClimateRefVar</name>
+      <dataType>string</dataType>
+      <sendEventsAttribute>yes</sendEventsAttribute>
+    </stateVariable>
+    <stateVariable>
+      <name>MinOnTimeVar</name>
       <dataType>i4</dataType>
       <defaultValue>0</defaultValue>
       <sendEventsAttribute>yes</sendEventsAttribute>
@@ -37,6 +47,7 @@
         <argument>
           <name>MessageText</name>
           <direction>in</direction>
+          <relatedStateVariable>MessageTextVar</relatedStateVariable>
         </argument>
       </argumentList>
     </action>
@@ -46,6 +57,7 @@
         <argument>
           <name>HoldClimateRef</name>
           <direction>in</direction>
+          <relatedStateVariable>HoldClimateRefVar</relatedStateVariable>
         </argument>
       </argumentList>
     </action>
@@ -55,7 +67,7 @@
         <argument>
           <name>MinOnTime</name>
           <direction>in</direction>
-          <relatedStateVariable>FanMinOnTime</relatedStateVariable>
+          <relatedStateVariable>MinOnTimeVar</relatedStateVariable>
         </argument>
       </argumentList>
     </action>
