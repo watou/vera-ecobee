@@ -5,31 +5,26 @@
     <minor>0</minor>
   </specVersion>
   <serviceStateTable>
-    <stateVariable>
+    <stateVariable sendEvents="yes">
       <name>currentClimateRef</name>
       <dataType>string</dataType>
-      <sendEventsAttribute>yes</sendEventsAttribute>
     </stateVariable>
-    <stateVariable>
+    <stateVariable sendEvents="yes">
       <name>HumidityModeState</name>
       <dataType>string</dataType>
-      <sendEventsAttribute>yes</sendEventsAttribute>
     </stateVariable>
-    <stateVariable>
+    <stateVariable sendEvents="yes">
       <name>MessageTextVar</name>
       <dataType>string</dataType>
-      <sendEventsAttribute>yes</sendEventsAttribute>
     </stateVariable>
-    <stateVariable>
+    <stateVariable sendEvents="yes">
       <name>HoldClimateRefVar</name>
       <dataType>string</dataType>
-      <sendEventsAttribute>yes</sendEventsAttribute>
     </stateVariable>
-    <stateVariable>
+    <stateVariable sendEvents="yes">
       <name>MinOnTimeVar</name>
       <dataType>i4</dataType>
       <defaultValue>0</defaultValue>
-      <sendEventsAttribute>yes</sendEventsAttribute>
     </stateVariable>
   </serviceStateTable>
   <actionList>
