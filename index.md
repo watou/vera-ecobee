@@ -283,7 +283,7 @@ Set a hold event to the setpoint and fan settings contained within a named clima
 
 * Updates to the state of thermostat and humidistat devices can take up to the polling number of seconds (180 by default) to be reflected in the UPnP devices (or as quickly as 5 seconds).
 
-[me]: http://forum.micasaverde.com/index.php?action=profile;u=19018
+[forum]: http://forum.micasaverde.com/index.php?topic=13836
 
 * The humidistat device currently only implements the humidity sensor service.
 
@@ -301,18 +301,9 @@ The source code repository and issue list can be located at <https://github.com/
 
 House icon copyright [Alexander Moore](http://www.mricons.com/show/iconset:vista-inspirate-icons).
 
-## Feedback  ##
+## Questions? Suggestions?  ##
 
-Please contact me through the [micasaverde.com forum][me].  All tips are gratefully accepted!
-
-<div  style="text-align:center">
-<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-<input type="hidden" name="cmd" value="_s-xclick">
-<input type="hidden" name="hosted_button_id" value="QUZULJ2GPLY7L">
-<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-</form>
-</div>
+Please contact other users through the [micasaverde.com forum][forum] for questions or suggested improvements.  
 
 ## Thanks ##
 
