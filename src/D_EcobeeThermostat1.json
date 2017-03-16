@@ -1,5 +1,6 @@
 {
     "flashicon": "http://watou.github.io/vera-ecobee/icons/thermostat.png",
+    "default_icon": "http://watou.github.io/vera-ecobee/icons/thermostat.png",
     "iconText": "1",
     "imgIconBody": "",
     "imgIconDimmable": "",
@@ -9,6 +10,56 @@
     "halloIconsDir": "pics/hallo",
     "x": "3",
     "y": "4",
+    "state_icons": [
+        {
+            "img": "http://watou.github.io/vera-ecobee/icons/thermostat.png",
+            "conditions": [
+                {
+                    "service": "urn:upnp-org:serviceId:HVAC_UserOperatingMode1",
+                    "variable": "ModeStatus",
+                    "operator": "==",
+                    "value": "Off",
+                    "subcategory_num": 1
+                }
+            ]
+        },
+        {
+            "img": "http://watou.github.io/vera-ecobee/icons/thermostat.png",
+            "conditions": [
+                {
+                    "service": "urn:upnp-org:serviceId:HVAC_UserOperatingMode1",
+                    "variable": "ModeStatus",
+                    "operator": "==",
+                    "value": "AutoChangeOver",
+                    "subcategory_num": 1
+                }
+            ]
+        },
+        {
+            "img": "http://anhman.neocities.org/Cool.png",
+            "conditions": [
+                {
+                    "service": "urn:upnp-org:serviceId:HVAC_UserOperatingMode1",
+                    "variable": "ModeStatus",
+                    "operator": "==",
+                    "value": "CoolOn",
+                    "subcategory_num": 1
+                }
+            ]
+        },
+        {
+            "img": "http://anhman.neocities.org/Heat.png",
+            "conditions": [
+                {
+                    "service": "urn:upnp-org:serviceId:HVAC_UserOperatingMode1",
+                    "variable": "ModeStatus",
+                    "operator": "==",
+                    "value": "HeatOn",
+                    "subcategory_num": 1
+                }
+            ]
+        }
+     ],
     "inScene": "1",
     "DisplayStatus": {
         "Style": "numeric",

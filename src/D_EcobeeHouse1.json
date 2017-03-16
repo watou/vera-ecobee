@@ -1,17 +1,38 @@
 {
     "flashicon": "http://watou.github.io/vera-ecobee/icons/house.png",
+    "default_icon": "http://watou.github.io/vera-ecobee/icons/house.png",
     "imgIconBody": "",
     "imgIconDimmable": "",
     "imgIconTurnable": "",
     "imgIconMin": "",
     "imgIconMax": "",
     "halloIconsDir": "pics/hallo",
-    "state_icons": [
-        "house_0.png",
-        "house_100.png"
-    ],
     "x": "2",
     "y": "4",
+    "state_icons": [
+        {
+            "img": "http://watou.github.io/vera-ecobee/icons/house_0.png",
+            "conditions": [
+                {
+                    "service": "urn:upnp-org:serviceId:SwitchPower1",
+                    "variable": "Status",
+                    "operator": "==",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "img": "http://watou.github.io/vera-ecobee/icons/house_100.png",
+            "conditions": [
+                {
+                    "service": "urn:upnp-org:serviceId:SwitchPower1",
+                    "variable": "Status",
+                    "operator": "==",
+                    "value": "1"
+                }
+            ]
+        }
+    ],
     "inScene": "1",
     "DisplayStatus": {
         "Service": "urn:upnp-org:serviceId:SwitchPower1",
@@ -128,6 +149,66 @@
                     },
                     "ControlCode": "im_away"
                 },
+{
+                    "ControlGroup": "1",
+                    "ControlType": "button",
+                    "top": "0",
+                    "left": "1",
+                    "Label": {
+                        "lang_tag": "cmd_sleep",
+                        "text": "Sleep"
+                    },
+                    "Display": {
+                        "Service": "urn:ecobee-com:serviceId:Ecobee1",
+                        "Variable": "currentClimateRef",
+                        "Value": "sleep",
+                        "Top": 60,
+                        "Left": 50,
+                        "Width": 75,
+                        "Height": 20
+                    },
+                    "Command": {
+                        "Service": "urn:ecobee-com:serviceId:Ecobee1",
+                        "Action": "SetClimateHold",
+                        "Parameters": [
+                            {
+                                "Name": "HoldClimateRef",
+                                "Value": "sleep"
+                            }
+                        ]
+                    },
+                    "ControlCode": "im_home"
+                },
+{
+                    "ControlGroup": "2",
+                    "ControlType": "button",
+                    "top": "0",
+                    "left": "1",
+                    "Label": {
+                        "lang_tag": "cmd_smart1",
+                        "text": "Vacation"
+                    },
+                    "Display": {
+                        "Service": "urn:ecobee-com:serviceId:Ecobee1",
+                        "Variable": "currentClimateRef",
+                        "Value": "smart1",
+                        "Top": 60,
+                        "Left": 145,
+                        "Width": 75,
+                        "Height": 20
+                    },
+                    "Command": {
+                        "Service": "urn:ecobee-com:serviceId:Ecobee1",
+                        "Action": "SetClimateHold",
+                        "Parameters": [
+                            {
+                                "Name": "HoldClimateRef",
+                                "Value": "smart1"
+                            }
+                        ]
+                    },
+                    "ControlCode": "im_away"
+                },
                 {
                     "ControlGroup": "3",
                     "ControlType": "label",
@@ -142,7 +223,8 @@
                         "Left": 50,
                         "Width": 75,
                         "Height": 20
-                    }
+                    },
+                    "ControlCode": "event"
                 },
                 {
                     "ControlGroup": "3",
@@ -156,7 +238,8 @@
                         "Height": 20,
                         "Service": "urn:ecobee-com:serviceId:Ecobee1",
                         "Variable": "currentEventType"
-                    }
+                    },
+                    "ControlCode": "event"
                 },
                 {
                     "ControlGroup": "3",
@@ -172,7 +255,8 @@
                         "Left": 145,
                         "Width": 75,
                         "Height": 20
-                    }
+                    },
+                    "ControlCode": "climate"
                 },
                 {
                     "ControlGroup": "3",
@@ -186,7 +270,8 @@
                         "Height": 20,
                         "Service": "urn:ecobee-com:serviceId:Ecobee1",
                         "Variable": "currentClimateRef"
-                    }
+                    },
+                    "ControlCode": "climate"
                 }
             ]
         },
@@ -250,20 +335,7 @@
                 }
             },
             "cmd_3": {
-                "label": "WAKEUP",
-                "serviceId": "urn:ecobee-com:serviceId:Ecobee1",
-                "action": "SetClimateHold",
-                "arguments": {
-                    "HoldClimateRef": "wakeup"
-                },
-                "display": {
-                    "service": "urn:ecobee-com:serviceId:Ecobee1",
-                    "variable": "currentClimateRef",
-                    "value": "wakeup"
-                }
-            },
-            "cmd_4": {
-                "label": "SLEEP",
+            "label": "SLEEP",
                 "serviceId": "urn:ecobee-com:serviceId:Ecobee1",
                 "action": "SetClimateHold",
                 "arguments": {
@@ -273,6 +345,19 @@
                     "service": "urn:ecobee-com:serviceId:Ecobee1",
                     "variable": "currentClimateRef",
                     "value": "sleep"
+                }
+            },
+            "cmd_4": {
+                "label": "VACATION",
+                "serviceId": "urn:ecobee-com:serviceId:Ecobee1",
+                "action": "SetClimateHold",
+                "arguments": {
+                    "HoldClimateRef": "smart1"
+                },
+                "display": {
+                    "service": "urn:ecobee-com:serviceId:Ecobee1",
+                    "variable": "currentClimateRef",
+                    "value": "smart1"
                 }
             }
         }
@@ -306,17 +391,17 @@
                             }
                         },
                         {
-                            "Wakeup": "wakeup",
-                            "HumanFriendlyText": {
-                                "lang_tag": "hft_device_set_to_wakeup",
-                                "text": "_DEVICE_NAME_ is set to wakeup"
-                            }
-                        },
-                        {
                             "Sleep": "sleep",
                             "HumanFriendlyText": {
                                 "lang_tag": "hft_device_set_to_sleep",
                                 "text": "_DEVICE_NAME_ is set to sleep"
+                            }
+                        },
+                        {
+                            "Vacation": "vacation",
+                            "HumanFriendlyText": {
+                                "lang_tag": "hft_device_set_to_vacation",
+                                "text": "_DEVICE_NAME_ is set to vacation"
                             }
                         }
                     ],
