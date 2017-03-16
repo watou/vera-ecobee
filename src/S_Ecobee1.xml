@@ -10,6 +10,11 @@
       <dataType>string</dataType>
       <sendEventsAttribute>yes</sendEventsAttribute>
     </stateVariable>
+    <stateVariable>
+      <name>HumidityModeState</name>
+      <dataType>string</dataType>
+      <sendEventsAttribute>yes</sendEventsAttribute>
+    </stateVariable>
   </serviceStateTable>
   <actionList>
     <action>

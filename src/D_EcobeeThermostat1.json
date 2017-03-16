@@ -24,7 +24,7 @@
             ]
         },
         {
-            "img": "thermostat_mode_auto.png",
+            "img": "http://watou.github.io/vera-ecobee/icons/thermostat.png",
             "conditions": [
                 {
                     "service": "urn:upnp-org:serviceId:HVAC_UserOperatingMode1",
@@ -36,7 +36,7 @@
             ]
         },
         {
-            "img": "thermostat_mode_cooling.png",
+            "img": "http://anhman.neocities.org/Cool.png",
             "conditions": [
                 {
                     "service": "urn:upnp-org:serviceId:HVAC_UserOperatingMode1",
@@ -48,7 +48,7 @@
             ]
         },
         {
-            "img": "thermostat_mode_heating.png",
+            "img": "http://anhman.neocities.org/Heat.png",
             "conditions": [
                 {
                     "service": "urn:upnp-org:serviceId:HVAC_UserOperatingMode1",

@@ -223,7 +223,8 @@
                         "Left": 50,
                         "Width": 75,
                         "Height": 20
-                    }
+                    },
+                    "ControlCode": "event"
                 },
                 {
                     "ControlGroup": "3",
@@ -237,7 +238,8 @@
                         "Height": 20,
                         "Service": "urn:ecobee-com:serviceId:Ecobee1",
                         "Variable": "currentEventType"
-                    }
+                    },
+                    "ControlCode": "event"
                 },
                 {
                     "ControlGroup": "3",
@@ -253,7 +255,8 @@
                         "Left": 145,
                         "Width": 75,
                         "Height": 20
-                    }
+                    },
+                    "ControlCode": "climate"
                 },
                 {
                     "ControlGroup": "3",
@@ -267,7 +270,8 @@
                         "Height": 20,
                         "Service": "urn:ecobee-com:serviceId:Ecobee1",
                         "Variable": "currentClimateRef"
-                    }
+                    },
+                    "ControlCode": "climate"
                 }
             ]
         },
