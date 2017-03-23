@@ -162,7 +162,7 @@
                         "Service": "urn:ecobee-com:serviceId:Ecobee1",
                         "Variable": "currentClimateRef",
                         "Value": "sleep",
-                        "Top": 60,
+                        "Top": 100,
                         "Left": 50,
                         "Width": 75,
                         "Height": 20
@@ -192,7 +192,7 @@
                         "Service": "urn:ecobee-com:serviceId:Ecobee1",
                         "Variable": "currentClimateRef",
                         "Value": "smart1",
-                        "Top": 60,
+                        "Top": 100,
                         "Left": 145,
                         "Width": 75,
                         "Height": 20
