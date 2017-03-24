@@ -954,7 +954,7 @@ decompress_lzo_file() {
       if isEmsThermostat(lul_device) then
         return away and setOccupied(session, selection, lul_device, false) or resumeProgram(session, selection, 3)
       else
-        return setClimateHold(session, selection, lul_device, away and "away" or "home" or "sleep" or "vacation")
+        return setClimateHold(session, selection, lul_device, away and "away" or "home" or "sleep" or "smart1")
       end
     end
 
