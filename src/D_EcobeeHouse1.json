@@ -100,7 +100,7 @@
                         "Variable": "currentClimateRef",
                         "Value": "home",
                         "Top": 60,
-                        "Left": 145,
+                        "Left": 50,
                         "Width": 75,
                         "Height": 20
                     },
@@ -129,7 +129,7 @@
                         "Variable": "currentClimateRef",
                         "Value": "away",
                         "Top": 60,
-                        "Left": 50,
+                        "Left": 145,
                         "Width": 75,
                         "Height": 20
                     },
