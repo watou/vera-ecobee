@@ -935,7 +935,7 @@ decompress_lzo_file() {
     end
 
     -- setAway will set the thermostat into "away" mode.
-    -- For non-EMS thermostats, Away -> setClimateHold to "home" or "away" or "sleep or "vacation"
+    -- For non-EMS thermostats, Away -> setClimateHold to "home" or "away"
     -- For EMS thermostats, Away -> setOccupied occupied=false; and Home -> resumeProgram x3.
     -- The home/away state is calculated based on whether one of these holds is the currently
     -- running event.
@@ -954,7 +954,7 @@ decompress_lzo_file() {
       if isEmsThermostat(lul_device) then
         return away and setOccupied(session, selection, lul_device, false) or resumeProgram(session, selection, 3)
       else
-        return setClimateHold(session, selection, lul_device, away and "away" or "home" or "sleep" or "smart1")
+        return setClimateHold(session, selection, lul_device, away and "away")
       end
     end
 
