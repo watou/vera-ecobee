@@ -35,10 +35,10 @@
     ],
     "inScene": "1",
     "DisplayStatus": {
-        "Service": "urn:upnp-org:serviceId:SwitchPower1",
-        "Variable": "Status",
-        "MinValue": "0",
-        "MaxValue": "1"
+        "Service": "urn:ecobee-com:serviceId:Ecobee1",
+        "Variable": "currentClimateRef",
+        "MinValue": "home",
+        "MaxValue": "smart1"
     },
     "doc_url": {
         "doc_language": 1,
@@ -56,36 +56,33 @@
             },
             "Position": "0",
             "TabType": "flash",
-            "ControlGroup": [
+            "top_navigation_tab": 1,
+	    "ControlGroup": [
                 {
                     "id": "1",
-                    "isSingle": "1",
+                    "isSingle": "0",
                     "scenegroup": "1"
                 },
                 {
                     "id": "2",
-                    "isSingle": "1",
-                    "scenegroup": "1"
-                },
-                {
-                    "id": "3",
+                    "type": "info",
                     "scenegroup": "2"
                 }
             ],
             "SceneGroup": [
                 {
                     "id": "1",
-                    "top": "3",
+                    "top": "0",
                     "left": "0",
-                    "x": "2",
-                    "y": "1"
+                    "x": "1",
+                    "y": "4"
                 },
                 {
                     "id": "2",
-                    "top": "0.5",
-                    "left": "0",
-                    "x": "2",
-                    "y": "2"
+                    "top": "0",
+                    "left": "1",
+                    "x": "1",
+                    "y": "1"
                 }
             ],
             "Control": [
@@ -93,7 +90,7 @@
                     "ControlGroup": "1",
                     "ControlType": "button",
                     "top": "0",
-                    "left": "1",
+                    "left": "0",
                     "Label": {
                         "lang_tag": "cmd_home",
                         "text": "Home"
@@ -120,9 +117,9 @@
                     "ControlCode": "im_home"
                 },
                 {
-                    "ControlGroup": "2",
+                    "ControlGroup": "1",
                     "ControlType": "button",
-                    "top": "0",
+                    "top": "1",
                     "left": "0",
                     "Label": {
                         "lang_tag": "cmd_away",
@@ -152,8 +149,8 @@
 {
                     "ControlGroup": "1",
                     "ControlType": "button",
-                    "top": "0",
-                    "left": "1",
+                    "top": "2",
+                    "left": "0",
                     "Label": {
                         "lang_tag": "cmd_sleep",
                         "text": "Sleep"
@@ -180,10 +177,10 @@
                     "ControlCode": "im_home"
                 },
 {
-                    "ControlGroup": "2",
+                    "ControlGroup": "1",
                     "ControlType": "button",
-                    "top": "0",
-                    "left": "1",
+                    "top": "3",
+                    "left": "0",
                     "Label": {
                         "lang_tag": "cmd_smart1",
                         "text": "Vacation"
@@ -210,7 +207,7 @@
                     "ControlCode": "im_away"
                 },
                 {
-                    "ControlGroup": "3",
+                    "ControlGroup": "2",
                     "ControlType": "label",
                     "top": "0",
                     "left": "0",
@@ -227,7 +224,7 @@
                     "ControlCode": "event"
                 },
                 {
-                    "ControlGroup": "3",
+                    "ControlGroup": "2",
                     "ControlType": "variable",
                     "top": "1",
                     "left": "0",
@@ -242,7 +239,7 @@
                     "ControlCode": "event"
                 },
                 {
-                    "ControlGroup": "3",
+                    "ControlGroup": "2",
                     "ControlType": "label",
                     "top": "0",
                     "left": "1",
@@ -259,7 +256,7 @@
                     "ControlCode": "climate"
                 },
                 {
-                    "ControlGroup": "3",
+                    "ControlGroup": "2",
                     "ControlType": "variable",
                     "top": "1",
                     "left": "1",
