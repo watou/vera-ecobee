@@ -221,7 +221,7 @@ decompress_lzo_file() {
     -- "Home" is defined as there being an active hold event with a holdClimateRef of "home", OR
     -- there being no current hold event but the current program's climate ref is "home"
     local function isHome(t)
-      return getCurrentClimateRef(t) == "home" or 
+      return getCurrentClimateRef(t) == "home" or getCurrentClimateRef(t) == "sleep" or
              (t.events and #t.events > 0 and t.events[1]["type"] == "switchOccupancy" and t.events[1].name == "occupied")
     end
 
@@ -935,7 +935,7 @@ decompress_lzo_file() {
     end
 
     -- setAway will set the thermostat into "away" mode.
-    -- For non-EMS thermostats, Away -> setClimateHold to "home" or "away"
+    -- For non-EMS thermostats, Away -> setClimateHold to "home" or "away" or "sleep or "vacation"
     -- For EMS thermostats, Away -> setOccupied occupied=false; and Home -> resumeProgram x3.
     -- The home/away state is calculated based on whether one of these holds is the currently
     -- running event.
@@ -954,7 +954,7 @@ decompress_lzo_file() {
       if isEmsThermostat(lul_device) then
         return away and setOccupied(session, selection, lul_device, false) or resumeProgram(session, selection, 3)
       else
-        return setClimateHold(session, selection, lul_device, away and "away" or "home")
+        return setClimateHold(session, selection, lul_device, away and "away" or "home" or "sleep" or "vacation")
       end
     end
 
@@ -1255,4 +1255,3 @@ decompress_lzo_file() {
     </action>
   </actionList>
 </implementation>
-
