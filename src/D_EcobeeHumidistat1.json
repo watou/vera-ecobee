@@ -239,5 +239,6 @@
             ]
         }
     ],
-    "DeviceType": "urn:schemas-ecobee-com:device:EcobeeHumidistat:1"
+    "DeviceType": "urn:schemas-ecobee-com:device:EcobeeHumidistat:1",
+    "device_type": "urn:schemas-ecobee-com:device:EcobeeHumidistat:1"
 }
