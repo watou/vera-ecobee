@@ -321,6 +321,14 @@ See and submit more on [Github](https://github.com/watou/vera-ecobee/issues?page
 
 ## History ##
 
+### 2018-10-26    v1.9
+
+Plugin stopped working, most likely due to dropping of support for TLS older than 1.2.
+
+Fixes:
+
+* TLS 1.0 no longer supported [#42](https://github.com/watou/vera-ecobee/issues/42)
+
 ### 2017-03-24    v1.8
 
 Fixes and enhancements:
